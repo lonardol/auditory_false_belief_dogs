@@ -1,0 +1,142 @@
+---
+title: "Auditory_FB_dogs_power_analysis"
+author: "Christoph Völter, Lucrezia Lonardo"
+date: "2024-07-25"
+output: html_document
+---
+## Load libraries and workspace
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(cowplot)
+library(gghalves)
+library(ggthemes)
+
+#load("power_sim_Auditory_FB.RData") not yet saved
+```
+
+Notes: between subject design, prediction: dogs follow suggestion more often in FB than TB. 
+## Generate data, informed by the values in Lonardo et al. (2021)
+
+```{r}
+set.seed(1)
+n.subject <- seq(from=80, to=168, by=8)# number subjects. Edited by LL
+n.per.subject <- 1 # observations per subject
+n.per.condition <- 1 # observations per subject and condition
+subj.id <- as.factor(paste("subj", 1:n.subject, sep = "."))
+age.range=c(10:168) # edited by LL
+breed = c("airedale_terrier","akita_inu","australian_shepherd","beagle","belgian_shepherd", "bernese_mountain_dog", "border_collie","borzoi","boxer", "bullmastiff", "chesapeake_bay_retriever", "collie", "coonhound", "english_setter","flat_coated_retriever","fox_terrier", "german_shepherd", "giant_schnauzer", "golden_retriever", "hovawart", "hungarian_greyhound", "irish_setter", "labrador", "parson_russel_terrier", "rhodesian_ridgeback", "rottweiler", "saluki", "samoyed", "shetland_sheep_dog", "siberian_husky", "spanish_greyhound", "swiss_hound", "vizsla", "weimaraner", "whippet", "white_swiss_shepherd") # edited by LL, includes both cooperative and independent breeds that were included in Lonardo et al. (2021), Exp. 1, where cooperative breeds were more represented in the sample.
+
+# fb.per <- c(0.5, 0.65) # performance in fb condition
+# tb.per <- c(0.30, 0.5) # performance in tb condition, old values
+
+fb.per<-.48
+tb.per<-.29 #edited by LL
+
+#LL: Std. Error of condition (belief, fixed effect) was estimated to be  0.443 in Lonardo et al. (2021)
+#Variance and st. dev of condition within breed (random effect) estimated 0
+# of Intercept within breed  var=0.1371   sd=0.3703  I am not sure where to insert these values when simulating the model.
+
+start.data <- data.frame(subj.id)
+
+xdata=data.frame(expand.grid(belief=c("false", "true"), sex=c("F", "M"), baited.fst=c("blue", "grey")))
+m.mat=model.matrix(object=~belief+sex+baited.fst, data=xdata)
+
+start.data<-cbind(start.data, xdata)
+
+table(start.data$belief, start.data$sex)
+table(start.data$baited.fst, start.data$sex)
+table(start.data$belief, start.data$baited.fst)
+```
+
+## Simulation
+
+```{r eval=FALSE, include=FALSE}
+n.simus <- 1000 
+
+
+# create object to store the simulation parameters and results:
+all.res <- data.frame(expand.grid(
+  n.subject=n.subject
+  n.per.subject = n.per.subject, 
+  fb.per = fb.per,
+  tb.per = tb.per,
+  simu = 1:n.simus
+))
+all.res$icpt <- NA
+all.res$belieftrue <- NA
+all.res$z.age <- NA
+all.res$sexM <- NA
+all.res$baited.fstgrey <- NA
+all.res$warns.full <- NA
+all.res$warns.null <- NA
+all.res$lrt.p.con <- NA
+all.res$lrt.p.age <- NA
+all.res$full.null.p <- NA
+
+all.ests <- matrix(NA, nrow = n.simus, ncol = 1)
+colnames(all.ests) <- c("lrt.p.con")
+
+# create data frame with design:
+## done above
+
+# load packages needed:
+library(lme4)
+# Loading required package: Matrix
+library(kyotil) # we want to store info about convergence issues
+
+xdata <- start.data
+
+# run simulation
+for (n in n.subject){ #LL added
+for (i in 1:nrow(all.res)) {
+  set.seed(i) # allows to later replicate individual simulations
+
+  # add age  (if it should be generated in each loop)
+  age <- sample(x = age.range, size = length(unique(xdata$subj.id)), replace = T)
+  xdata$age <- as.numeric(age[as.numeric(xdata$subj.id)])
+  xdata$z.age <- as.vector(scale(xdata$age))
+
+  m.mat <- model.matrix(object = ~ belief+sex+baited.fst+z.age, re="(1|breed)", data = xdata) # create model martix #LL: added re (?)
+
+  coefs <- c(
+    "(Intercept)" = qlogis(all.res[i, "fb.per"]),#performance in fb condition
+    "belieftrue" = qlogis(all.res[i, "tb.per"])-qlogis(all.res[i, "fb.per"]),#performance in tb condition
+    "sexM" = 0,
+    "baited.fstgrey" = 0,
+    "z.age" = 0
+  )
+
+  LP <- m.mat[, names(coefs)] %*% coefs # LP wrt fixed effects
+
+  # generate response:
+xdata$choice <- rbinom(n = nrow(xdata), size = 1, prob = exp(LP) / (1 + exp(LP)))
+
+  #LL: scale and center factors and age for random effects part of the model
+  xdata<-xdata %>% 
+    mutate(belief.c=scale(belief, center=TRUE) %>% 
+    mutate(sex.c=scale(sex, center=TRUE) %>% 
+    mutate(baited.fst.c=scale(baited.fst, center=TRUE)) %>% 
+    mutate(z.age=scale(age, center=TRUE)))
+
+  # fit full model:
+  full <- keepWarnings(glmer(choice~belief+sex+baited.fst+z.age +
+       (1+ sex.c + belief.c + baited.fst.c + z.age|| breed), #LL: GLMM
+			 family=binomial, data=xdata, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)
+    ))
+  # fit null model:             #LL: I am not sure why a null model is needed in this case, since we are only interested in the effect of belief.
+  null <- keepWarnings(glmer(choice ~ sex+baited.fst+z.age +
+       (1+ sex.c + baited.fst.c + z.age|| breed), 
+			 family=binomial, data=xdata, control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)
+  ))
+  # store results:
+  all.res[i, c("icpt", "belieftrue", "z.age", "sexM", "baited.fstgrey")] <- coef(full$value)
+  all.res[i, "warns.full"] <- nchar(paste(full$warnings, collapse = ""))
+  all.res[i, "warns.null"] <- nchar(paste(null$warnings, collapse = ""))
+  all.res[i, "lrt.p.con"] <- as.data.frame(drop1(full$value, test = "Chisq"))["belief", "Pr(>Chi)"]
+  all.res[i, "lrt.age.p"] <- as.data.frame(drop1(full$value, test = "Chisq"))["z.age", "Pr(>Chi)"]
+    all.res[i, "full.null.p"] <- as.data.frame(anova(null$value, full$value, test = "Chisq"))[2, "Pr(>Chi)"]
+}}
+
+save.image("power_sim_Auditory_FB.RData")
+```
