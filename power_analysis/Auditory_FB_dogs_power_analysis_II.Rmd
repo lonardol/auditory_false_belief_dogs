@@ -1,0 +1,314 @@
+---
+title: "Auditory_FB_dogs_power_analysis"
+author: "Christoph Völter, Lucrezia Lonardo"
+date: "2024-07-25"
+output: html_document
+---
+## Load libraries and workspace
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(cowplot)
+library(gghalves)
+library(ggthemes)
+library(lme4)
+# Loading required package: Matrix
+library(kyotil) # we want to store info about convergence issues
+
+#load("power_sim_Auditory_FB.RData_II") not yet saved
+```
+
+Notes: between subject design, prediction: dogs follow suggestion more often in FB than TB. 
+## Generate data, informed by the values in Lonardo et al. (2021)
+
+```{r}
+set.seed(1)
+#n.subject <- seq(from=120, to=210, by=8)# number subjects (from 40 to 70 per condition). Edited by LL
+n.subject <- seq(from=120, to=240, by=12)# number subjects (from 40 to 80 per condition). Edited by LL
+n.per.subject <- 1 # observations per subject
+n.per.condition <- 1 # observations per subject and condition
+subj.id <- as.factor(paste("subj", 1:n.subject, sep = "."))
+age.range=c(10:168) # edited by LL
+breed = c("airedale_terrier","akita_inu","australian_shepherd","beagle","belgian_shepherd", "bernese_mountain_dog", "border_collie","borzoi","boxer", "bullmastiff", "chesapeake_bay_retriever", "collie", "coonhound", "english_setter","flat_coated_retriever","fox_terrier", "german_shepherd", "giant_schnauzer", "golden_retriever", "hovawart", "hungarian_greyhound", "irish_setter", "labrador", "parson_russel_terrier", "rhodesian_ridgeback", "rottweiler", "saluki", "samoyed", "shetland_sheep_dog", "siberian_husky", "spanish_greyhound", "swiss_hound", "vizsla", "weimaraner", "whippet", "white_swiss_shepherd") # edited by LL, includes both cooperative and independent breeds that were included in Lonardo et al. (2021), Exp. 1, where cooperative breeds were more represented in the sample.
+
+# fb.per <- c(0.5, 0.65) # performance in fb condition
+# tb.per <- c(0.30, 0.5) # performance in tb condition, old values
+
+fb.per<-.48
+know.per<-.29 #edited by LL
+knctr.per<-.29
+
+start.data <- data.frame(subj.id)
+
+xdata=data.frame(expand.grid(condition=c("false_belief", "knowledge", "knowledge_sound_control"), sex=c("F", "M"), baited.fst=c("blue", "grey")))
+m.mat=model.matrix(object=~condition+sex+baited.fst, data=xdata)
+
+start.data<-cbind(start.data, xdata) #useful for creating counterbalancing
+
+table(start.data$condition, start.data$sex)
+table(start.data$baited.fst, start.data$sex)
+table(start.data$condition, start.data$baited.fst)
+```
+## Checks
+```{r}
+# does each subject have only one condition and sex?
+xx <- table(start.data$subj.id, start.data$condition)
+range(apply(X = xx > 0, MARGIN = 1, sum))
+
+xx <- table(start.data$subj.id, start.data$sex)
+range(apply(X = xx > 0, MARGIN = 1, sum))
+```
+```{r}
+# random effects for breed
+
+#LL: Std. Error of condition (fixed effect) was estimated to be  0.443 in Lonardo et al. (2021)
+#Variance and st. dev of condition within breed (random effect) estimated 0
+# of Intercept within breed (re) var = 0.1371   sd = 0.3703 
+
+# educated guess of what the random effect could be
+# (based on the qlogis of the reference level performance)
+#r.effects <- c(abs(qlogis(fb.per)))  = 0.08
+r.effects <- 0.08
+
+# random slope for condition and sex within breed
+r.slope.condition <- 0.8  #abs(qlogis(fb.per))-abs(qlogis(know.per))
+# r.slope.sex <- 0.4 
+# r.slope.baited.fst <- 0.4
+# r.slope.age <- 0.4
+
+```
+
+
+
+
+## Simulation
+
+```{r eval=FALSE, include=FALSE}
+n.simus <- 1000
+
+all.res.all.samples <- data.frame()
+
+# define control structure to make convergence more likely:
+contr <- glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000), nAGQ=FALSE)
+
+for (j in 1:length(n.subject)) {
+
+  # create object to store the simulation parameters and results:
+
+  all.res <- data.frame(expand.grid(
+   # n.subject=n.subject, 
+    r.effect = r.effects,
+    n.per.subject = n.per.subject, 
+    r.slope.condition = r.slope.condition,
+    fb.per = fb.per,
+    know.per = know.per,
+    knctr.per =knctr.per,
+   # r.slope.sex = r.slope.sex,
+   # r.slope.baited.fst = r.slope.baited.fst, 
+   # r.slope.age = r.slope.age,
+    simu = 1:n.simus
+  ))
+  all.res$n.subject<-n.subject[j]
+  all.res$icpt <- NA
+  all.res$conditionknow <- NA
+  all.res$conditionknctr <- NA
+  all.res$sexM <- NA
+  all.res$baited.fstgrey <- NA
+  all.res$z.age <- NA
+  all.res$re.sd <- NA
+  # all.res$lrt.p.con.know <- NA
+  # all.res$lrt.p.con.knctr <- NA
+  all.res$lrt.p.con<- NA
+  #all.res$lrt.p.z.age <- NA
+  #all.res$lrt.p.sex <- NA
+  #all.res$lrt.p.baited.fst <- NA
+  all.res$warns.full <- NA
+  all.res$warns.null <- NA
+  #all.res$full.null.p <- NA
+
+  
+  all.ests <- matrix(NA, nrow = n.simus, ncol = 1)
+  colnames(all.ests) <- c("lrt.p.con")
+
+# create data frame with design:
+start.data <- data.frame(subj.id = as.factor(paste("subj", str_pad(1:n.subject[j], 2, pad = "0"), sep = "."))) 
+xdata=data.frame(expand.grid(condition=c("false_belief", "knowledge", "knowledge_sound_control"), sex=c("F", "M"), baited.fst=c("blue", "grey")))
+start.data<-cbind(start.data, xdata)
+  # add age and breed (if they should be generated in each loop)
+  age <- sample(x = age.range, size = length(unique(start.data$subj.id)), replace = T)
+  start.data$age <- as.numeric(age[as.numeric(start.data$subj.id)])
+  start.data$z.age <- as.vector(scale(as.numeric(start.data$age))) 
+  start.data$breed <- as.factor(sample(x = breed, size = length(unique(start.data$subj.id)), replace = T))
+                              
+                              
+  # dummy code factors
+start.data$condition <- as.factor(start.data$condition)
+start.data$condition.dummy1 <- as.numeric(start.data$condition == levels(start.data$condition)[2])
+start.data$condition.dummy2 <- as.numeric(start.data$condition == levels(start.data$condition)[3])
+#start.data$sex.dummy1 <- as.numeric(start.data$sex)
+#start.data$baited.fst.dummy1 <-as.numeric(start.data$baited.fst)
+
+  # center condition for random slopes:
+start.data$condition.dummy1.c <- start.data$condition.dummy1 - mean(start.data$condition.dummy1)
+start.data$condition.dummy2.c <- start.data$condition.dummy2 - mean(start.data$condition.dummy2)
+  # center sex for random slopes:
+  # start.data$sex.dummy1.c <- start.data$sex.dummy1 - mean(start.data$sex.dummy1)
+  # center first baited box for random slopes:
+  # start.data$baited.fst.dummy1.c <- start.data$baited.fst.dummy1 - mean(start.data$baited.fst.dummy1)
+  
+
+xdata <- start.data
+
+# run simulation
+for (i in 1:nrow(all.res)) {
+  set.seed(i) # allows to later replicate individual simulations
+
+
+  m.mat <- model.matrix(object = ~ condition+sex+baited.fst+z.age, data = xdata) # create model martix 
+
+  
+  coefs <- c(
+      "(Intercept)" = log(all.res[i, "fb.per"] / (1 - all.res[i, "fb.per"])),
+      "conditionknowledge" = log(all.res[i, "know.per"] / (1 - all.res[i, "know.per"] )) - log(all.res[i, "fb.per"] / (1 - all.res[i, "fb.per"])),
+      "conditionknowledge_sound_control" = log(all.res[i, "knctr.per"] / (1 - all.res[i, "knctr.per"] )) - log(all.res[i, "fb.per"] / (1 - all.res[i, "fb.per"])),
+      "sexM" = 0,
+      "baited.fstgrey" = 0,
+      "z.age" = -0.49 #based on model estimate in Lonardo et al. (2021) Table S5
+    )
+
+  LP <- m.mat[, names(coefs)] %*% coefs # LP wrt fixed effects
+  
+  # add random effect to linear predictor:
+      LP <- LP + rnorm(n = n.subject[j], sd = all.res[i, "r.effect"])[as.numeric(xdata$breed)] +
+       # rnorm(n = n.subject[j], sd = all.res[i, "r.slope.age"])[as.numeric(xdata$breed)] * xdata$z.age +
+        rnorm(n = n.subject[j], sd = all.res[i, "r.slope.condition"])[as.numeric(xdata$breed)] * xdata$condition.dummy1.c  +
+        rnorm(n = n.subject[j], sd = all.res[i, "r.slope.condition"])[as.numeric(xdata$breed)] * xdata$condition.dummy2.c 
+       # rnorm(n = n.subject[j], sd = all.res[i, "r.slope.baited.fst"])[as.numeric(xdata$breed)] * xdata$baited.fst.dummy1.c +
+       # rnorm(n = n.subject[j], sd = all.res[i, "r.slope.sex"])[as.numeric(xdata$breed)] * xdata$sex.dummy1.c 
+          
+
+  # generate response:
+xdata$choice <- rbinom(n = nrow(xdata), size = 1, prob = exp(LP) / (1 + exp(LP)))
+
+  # fit full model:
+  full <- keepWarnings(glmer(choice ~ condition + sex + baited.fst + z.age +
+       (1 + condition.dummy1.c + condition.dummy2.c | breed), 
+			 family=binomial, data=xdata, control=contr
+    ))
+  
+  
+  
+  #LL: with the first full model I tried to fit I got this error: number of observations (=120) < number of random effects (=216) for term (1 + sex.dummy1.c + condition.dummy1.c + condition.dummy2.c + baited.fst.dummy1.c + z.age | breed); the random-effects parameters are probably unidentifiable
+  #So I removed the random slope of baited.fst, but got a similar error, 
+  #so I also removed the r.s. of age, but got again a similar error, 
+  #so I removed also the r.s. of sex
+  
+  
+  
+   # fit null model: (to get a test of condition as a whole)                                  
+   null <- keepWarnings(glmer(choice ~ sex+baited.fst+z.age +
+       (1 | breed), 
+ 			 family=binomial, data=xdata, control=contr
+   ))
+  # store results:
+  all.res[i, c("icpt", "conditionknow", "conditionknctr", "sexM", "baited.fstgrey", "z.age")] <- fixef (full$value)
+  all.res[i, "warns.full"] <- nchar(paste(full$warnings, collapse = ""))
+  all.res[i, "warns.null"] <- nchar(paste(null$warnings, collapse = ""))
+  all.res[i, "re.sd"] <- as.data.frame(summary(full$value)$varcor)[1, "sdcor"]
+  # all.res[i, "lrt.p.con.know"] <- as.data.frame(drop1(full$value, test = "Chisq"))["conditionknowledge", "Pr(>Chisq)"]   #LL: drop1 does not seem to yield p values 
+  # all.res[i, "lrt.p.con.knctr"] <- as.data.frame(drop1(full$value, test = "Chisq"))["conditionknowledge_sound_control", "Pr(>Chisq)"]
+  # all.res[i, "lrt.p.con"] <- as.data.frame(drop1(full$value, test = "Chisq"))["condition", "Pr(Chisq)"]
+  #all.res[i, "lrt.p.age"] <- as.data.frame(drop1(full$value, test = "Chisq"))["z.age", "Pr(>Chisq)"]
+ # all.res[i, "lrt.p.sex"] <- as.data.frame(drop1(full$value, test = "Chisq"))["sexM", "Pr(>Chisq)"]
+ # all.res[i, "lrt.p.baited.fst"] <- as.data.frame(drop1(full$value, test = "Chisq"))["baited.fstgrey", "Pr(>Chisq)"]
+ # all.res[i, "full.null.p"] <- as.data.frame(anova(null$value, full$value, test = "Chisq"))[2, "Pr(>Chisq)"]
+ all.res[i, "lrt.p.con"] <- as.data.frame(anova(null$value, full$value, test = "Chisq"))[2, "Pr(>Chisq)"]
+                             
+   print(c("sim # =",i, " sample size =" , n.subject[j]))
+  }
+ 
+all.res.all.samples <- rbind(all.res.all.samples, all.res)
+
+}
+
+save.image("power_sim_Auditory_FB.RData_II")
+```
+## Evaluation of results 
+
+* number of warning per combinations of random effects (out of 1000 models per cell)  
+Full model:  
+```{r echo=FALSE}
+#full model
+tapply(X=all.res.all.samples[, "warns.full"]>0, INDEX=all.res.all.samples[, c("n.subject", "fb.per", "know.per", "knctr.per", "r.effect")],
+FUN=sum)
+#warning codes: 
+#...
+```
+
+
+## Only models that converged are evaluated from here on:  
+
+```{r include=FALSE}
+all.res2=subset(all.res.all.samples, warns.full==0)
+```
+
+
+### How many models converged, have a significant full-null model comparison, and a significant LRT of condition?  
+```{r echo=FALSE}
+n.converged<- all.res2%>%
+    group_by(n.subject, fb.per, know.per, knctr.per, r.effect ) %>% #, r.slope.int
+  summarise(n.converged=length(lrt.p.con))
+
+
+lrt.data2 <- all.res2 %>%
+  #filter(full.null.p<0.05)%>%
+  group_by(n.subject, fb.per, know.per, knctr.per, r.effect) %>% #, r.slope.int
+  summarise(lrt.p.con.median = median(lrt.p.con), 
+           # lrt.p.trial.median = median(lrt.p.trial),
+          #  lrt.p.age.median = median(lrt.p.age),
+            n.sign.lrt.con = length(lrt.p.con[lrt.p.con < 0.05]),
+           # n.sign.lrt.trial = length(lrt.p.trial[lrt.p.trial < 0.05]),
+           # n.sign.lrt.age = length(lrt.p.order[lrt.p.age < 0.05]),
+            n.lrt = n.simus,
+            proportion.sign.lrt.con = length(lrt.p.con[lrt.p.con < 0.05]) / n.simus) %>% 
+           # proportion.sign.lrt.trial = length(lrt.p.trial[lrt.p.trial < 0.05]) / n.simus,
+            #proportion.sign.lrt.age = length(lrt.p.age[lrt.p.age < 0.05]) / n.simus)%>%
+  full_join(n.converged)
+
+lrt.data2
+```
+
+#### Plotting the proportion of significant LRTs for the predictor variable condition ONLY based on models that converged and with a significant full-null model comparison
+```{r echo=FALSE}
+
+# New facet label names for knctr.per variable
+knctr.per.labs <- c("LL: 0.4", "LL: 0.5")
+names(knctr.per.labs) <- c("0.4", "0.5")
+
+# New facet label names for n.subject variable
+n.subject.labs <- c( "N = 48", "N = 60", "N = 72")
+names(n.subject.labs) <- c("48", "60", "72")
+
+p.con.power <- ggplot(data = lrt.data2, aes(x=as.factor(fb.per) ,y = proportion.sign.lrt.con, fill=as.factor(know.per))) +
+  geom_bar(stat="identity", color="black", position=position_dodge())+
+  scale_y_continuous(breaks=seq(0,1,0.2), limits=c(0, 1))+
+  geom_hline(yintercept = 0.8, colour = "black", lwd = 1, lty = 2) +
+   # geom_hline(yintercept = 0.05, colour = "darkgrey", lwd = 1.1, lty = 4) +
+  scale_fill_manual(values=c("dodgerblue", "darkorange"))+
+  labs(fill = "HL condition", y="Power", x= "HH condition") +
+  theme_bw()+
+  ggtitle("Different sample sizes (48 - 72), Absent entities")+
+  geom_text(aes(label=round(proportion.sign.lrt.con,2)), position=position_dodge(width=0.9), vjust=-0.25)+
+  facet_grid(knctr.per~n.subject, labeller = labeller(knctr.per = knctr.per.labs, n.subject = n.subject.labs))
+  #theme(legend.position="none")
+p.con.power
+```
+
+
+```{r echo=FALSE}
+ggsave(p.con.power, filename = "absent_entities_power_differentNs_power3.png", scale = 0.55, height = 12, width = 16)
+```
+
+
+
+
