@@ -15,7 +15,7 @@ library(lme4)
 # Loading required package: Matrix
 library(kyotil) # we want to store info about convergence issues
 
-#load("power_sim_Auditory_FB_VII.RData") 
+load("power_sim_Auditory_FB_VII.RData") 
 ```
 
 Notes: between subject design, prediction: dogs follow suggestion more often in FB than TB. 
