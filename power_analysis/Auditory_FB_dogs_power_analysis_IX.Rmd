@@ -15,7 +15,7 @@ library(lme4)
 # Loading required package: Matrix
 library(kyotil) # we want to store info about convergence issues
 
-#load("power_sim_Auditory_FB_IX.RData") 
+load("power_sim_Auditory_FB_IX.RData") 
 ```
 
 Notes: between subject design, prediction: dogs follow suggestion more often in FB than TB. 
@@ -255,7 +255,7 @@ Full model:
 tapply(X=all.res.all.samples[, "warns.full"]>0, INDEX=all.res.all.samples[, c("n.subject", "fb.per", "know.per", "knctr.per", "r.effect")],
 FUN=sum)
 #warning codes: 
-#...
+#with 240, subjects, 15 models out of 1000 resulted in warnings. 
 ```
 
 
@@ -269,13 +269,13 @@ all.res2=subset(all.res.all.samples, warns.full==0)
 ### How many models converged, have a significant full-null model comparison, and a significant LRT of condition?  
 ```{r echo=FALSE}
 n.converged<- all.res2%>%
-    group_by(n.subject, fb.per, know.per, knctr.per, r.effect ) %>% #, r.slope.int
+    group_by(n.subject, fb.per, know.per, knctr.per, r.effect ) %>% 
   summarise(n.converged=length(lrt.p.con))
-
+n.converged #wih 240 subjects, 985 out of 1000 (almost 99% of) models converged
 
 lrt.data2 <- all.res2 %>%
   #filter(full.null.p<0.05)%>%
-  group_by(n.subject,fb.per, know.per, knctr.per, r.effect) %>% #, r.slope.int
+  group_by(n.subject,fb.per, know.per, knctr.per, r.effect) %>% 
   summarise(lrt.p.con.median = median(lrt.p.con), 
            # lrt.p.trial.median = median(lrt.p.trial),
           #  lrt.p.age.median = median(lrt.p.age),
@@ -296,6 +296,18 @@ save.image("power_sim_Auditory_FB_IX.RData")
 ```
 
 ###Plotting 
+
+```{r}
+ggplot(lrt.data2, aes(x=n.subject, y=proportion.sign.lrt.con*100)) +
+  geom_bar(stat="identity") +
+  ylab("Power (% significant LRT)") + 
+  xlab("Total sample size") +
+  xlim(x=c(120,250)) +
+  scale_x_continuous(breaks = lrt.data2$n.subject) +
+  geom_hline(yintercept=80, col="blue", lty=2, lwd=.9) +
+  theme_classic()
+```
+
 ```{r}
 xdata_agg<- xdata %>%
   group_by(condition)%>%
