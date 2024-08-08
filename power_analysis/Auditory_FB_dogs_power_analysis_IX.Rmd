@@ -298,7 +298,7 @@ save.image("power_sim_Auditory_FB_IX.RData")
 ###Plotting 
 
 ```{r}
-ggplot(lrt.data2, aes(x=n.subject, y=proportion.sign.lrt.con*100)) +
+plot.sample.sizes.power.auditory_FB<-ggplot(lrt.data2, aes(x=n.subject, y=proportion.sign.lrt.con*100)) +
   geom_bar(stat="identity") +
   ylab("Power (% significant LRT)") + 
   xlab("Total sample size") +
@@ -306,6 +306,7 @@ ggplot(lrt.data2, aes(x=n.subject, y=proportion.sign.lrt.con*100)) +
   scale_x_continuous(breaks = lrt.data2$n.subject) +
   geom_hline(yintercept=80, col="blue", lty=2, lwd=.9) +
   theme_classic()
+ggsave(plot.sample.sizes.power.auditory_FB, filename = "./plot/sample_sizes_power_analysis_auditory_FB.png", scale = 0.55, height = 6, width = 10)
 ```
 
 ```{r}
