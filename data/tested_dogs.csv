@@ -16,7 +16,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 15,Ella4,blue,no_displacement,no_displacement,control,golden_retriever,f,no,8,11/10/2022,21/10/2024,24,no,GR,CH,2,2,2,no,6,B,grey,sausages
 16,Paddy,blue,no_displacement,no_displacement,control,irish_setter,m,no,7,18/03/2017,22/10/2024,91,"mantrailing, obedience, breed_exhibitions, hunting",VB,LL,2,2,2,no,6,A,blue,
 17,Allegro2,blue,no_displacement,displacement,knowledge,border_collie,m,no,1,17/5/2013,12/10/2024,136,,VB,CH,2,2,2,no,6,A,blue,
-18,,blue,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
+18,Saphira4,blue,no_displacement,no_displacement,control,german_shepherd,f,yes,1,11/09/2021,23/10/2024,37,"therapiebegleithund, id_tracking, agility",GR,CH,2,2,2,no,6,B,grey,sausages
 19,,blue,displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
 20,Destino,grey,no_displacement,no_displacement,knowledge,border_collie,m,no,1,21/01/2020,12/10/2024,56,,VB,CH,2,2,2,no,6,A,grey,
 21,Jaguar,grey,no_displacement,no_displacement,knowledge,dutch_shepherd,m,yes,1,08/12/2014,18/10/2024,118,no,GR,VB,3,2,2,1_in_phase_1,7,B,blue,sausages
@@ -27,7 +27,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 26,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 27,Thor3,blue,no_displacement,no_displacement,knowledge,welsh_corgi_pembroke,m,yes,1,30/10/2021,19/10/2024,35,tricktraining,GR,VB,4,2,2,no,8,A,blue,
 28,,blue,displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
-29,,blue,no_displacement,no_displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+29,Frida3,blue,no_displacement,no_displacement,knowledge,australian_shepherd,f,no,1,07/03/2021,22/10/2024,43,"agility, obedience",GR,VB,2,4,2,no,8,B,grey,sausages
 30,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 31,,grey,displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 32,,grey,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,2.426900585,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,2.643274854,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. FB,12.31460674,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. KNOW,6,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. KNOW,6.524390244,,,,,,,,,,

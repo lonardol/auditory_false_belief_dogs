@@ -20,16 +20,23 @@ xdata <- read.csv("data/tested_dogs.csv", header = TRUE) %>%
 
 
 ```{r pressure, echo=FALSE}
+#descriptive statistics
 plot.data <- xdata %>%
   mutate(choice=ifelse(choice_letter == "A", 1, 0)) %>% 
+  mutate(condition = fct_relevel(
+  fct_recode(condition, 
+             "false belief" = "false_belief", 
+             "knowledge" = "knowledge", 
+             "control" = "control"),
+  "false belief", "knowledge", "control" ))%>%#specify order of factor levels for factor_relevel
   group_by(condition)%>%
-  summarise(mean.correct=mean(choice), sd.correct=sd(choice), sum.correct=sum(choice), median.correct=median(choice), n.correct=length(choice), se.correct=sd(choice)/sqrt(length(choice)))
+  summarise(mean.choiceA=mean(choice), sd.choiceA=sd(choice), n.choseA=sum(choice), median.choiceA=median(choice), n.tested.per.cond=length(choice), se.choiceA=sd(choice)/sqrt(length(choice)))
 plot.data
 
 p.choice<-ggplot(
-  data=plot.data, aes(x=condition, y=mean.correct)) +
+  data=plot.data, aes(x=condition, y=mean.choiceA)) +
   geom_bar(stat="identity", alpha=0.5)+
-  geom_errorbar(aes(ymin=mean.correct-se.correct, ymax=mean.correct+se.correct), width=.2) +
+  geom_errorbar(aes(ymin=mean.choiceA-se.choiceA, ymax=mean.choiceA+se.choiceA), width=.2) +
   #ylim(0,0.8)+
   #geom_signif(comparisons=list(c("False Belief", #"True Belief")), annotations="*",
  #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
