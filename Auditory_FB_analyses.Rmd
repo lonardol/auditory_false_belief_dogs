@@ -4,46 +4,83 @@ author: "Lucrezia Lonardo"
 date: "2024-10-22"
 output: html_document
 ---
-### libraries
+### Load libraries
 ```{r}
 library(tidyverse)
+library(ggplot2)
 ```
 
 ### Import data
 
 ```{r}
 xdata <- read.csv("data/tested_dogs.csv", header = TRUE) %>% 
-  na.omit
+  na.omit %>% 
+  mutate(choice_letter = as.factor(choice_letter)) %>% 
+  mutate(condition = as.factor(condition))
 ```
 
 ### Plots
 
 
 ```{r pressure, echo=FALSE}
+
 #descriptive statistics
+##nr. dogs choosing bucket A and B overall
+table(xdata$choice_letter)
+##proportions relative to the whole sample
+mean(xdata$choice_letter=="A")
+mean(xdata$choice_letter=="B")
+##nr. dogs choosing bucket A and B in each condition
+table(xdata$condition, xdata$choice_letter)
+##proportions relative to the different conditions
+fb_subset <- xdata[xdata$condition == "false_belief", ]
+know_subset <- xdata[xdata$condition == "knowledge", ]
+ctr_subset <- xdata[xdata$condition == "control", ]
+mean(fb_subset$choice_letter=="A")
+mean(know_subset$choice_letter=="A")
+mean(ctr_subset$choice_letter=="A")
+
+#table with descriptive stats for plotting
 plot.data <- xdata %>%
-  mutate(choice=ifelse(choice_letter == "A", 1, 0)) %>% 
+  mutate(choice = ifelse(choice_letter == "A", 1, 0)) %>%
   mutate(condition = fct_relevel(
-  fct_recode(condition, 
-             "false belief" = "false_belief", 
-             "knowledge" = "knowledge", 
-             "control" = "control"),
-  "false belief", "knowledge", "control" ))%>%#specify order of factor levels for factor_relevel
-  group_by(condition)%>%
-  summarise(mean.choiceA=mean(choice), sd.choiceA=sd(choice), n.choseA=sum(choice), median.choiceA=median(choice), n.tested.per.cond=length(choice), se.choiceA=sd(choice)/sqrt(length(choice)))
+    fct_recode(
+      condition,
+      "false belief" = "false_belief",
+      "knowledge" = "knowledge",
+      "control" = "control"
+    ),
+    "false belief",
+    "knowledge",
+    "control"
+  )) %>% #specify order of factor levels for factor_relevel
+  group_by(condition) %>%
+  summarise(
+    mean.choiceA = mean(choice),
+    sd.choiceA = sd(choice),
+    n.choseA = sum(choice),
+    median.choiceA = median(choice),
+    n.tested.per.cond = length(choice),
+    se.choiceA = sd(choice) / sqrt(length(choice))
+  )
+
 plot.data
 
-p.choice<-ggplot(
-  data=plot.data, aes(x=condition, y=mean.choiceA)) +
-  geom_bar(stat="identity", alpha=0.5)+
-  geom_errorbar(aes(ymin=mean.choiceA-se.choiceA, ymax=mean.choiceA+se.choiceA), width=.2) +
+##barplot of choices by experimental group
+
+p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
+  geom_bar(stat = "identity", alpha = 0.5) +
+  geom_errorbar(aes(ymin = mean.choiceA - se.choiceA, ymax = mean.choiceA + #error bars represent standard error
+                      se.choiceA),
+                width = .2) +
   #ylim(0,0.8)+
-  #geom_signif(comparisons=list(c("False Belief", #"True Belief")), annotations="*",
- #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
-  theme_classic()+
-  labs(x="Experimental group",y="Proportion of bucket A choices")#+
-  #ggtitle("Border Collies (N=40)")
- p.choice
+  #geom_signif(comparisons=list(c("False Belief", #"Knowledge")), annotations="*",
+  #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
+  theme_classic() +
+  labs(x = "Experimental group", y = "Proportion of bucket A choices")+
+  ggtitle("All breeds (N=26)")
+
+p.choice
  
 #saving the plot with ggsave
 # ggsave(
@@ -58,7 +95,41 @@ p.choice<-ggplot(
 #   dpi = 320,
 #   limitsize = TRUE
 # )
-# ggplot(aes=xdata$condition, xdata$choice_letter)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#mosaic plot to visualize also bucket B choices
+mosaic.plot.data  <- xdata %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "Knowledge" = "knowledge",
+      "Control" = "control"
+    ),
+    "False belief",
+    "Knowledge",
+    "Control"
+  )) #specify order of factor levels for factor_relevel
+
+plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen")
+
+
+#saving the plot with ggsave
+# ggsave(
+#   "./graphs/bucket_A_choices_BC.png",
+#   plot = last_plot(),
+#   device = NULL,
+#  # path = "C:/Users/lonardol/Desktop/False Belief experiment/FB_2_follow_up/Graphs/Border Collies",
+#   scale = 0.8,
+#   width = 7,
+#   height = 6,
+#   #units = c("in", "cm", "mm"),
+#   dpi = 320,
+#   limitsize = TRUE
+# )
+```
+
