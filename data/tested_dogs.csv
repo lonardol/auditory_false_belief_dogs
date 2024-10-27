@@ -9,31 +9,31 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 8,Woody2,grey,no_displacement,displacement,false_belief,irish_setter,m,no,7,26/04/2019,22/10/2024,65,"mantrailing, obedience, breed_exhibitions, hunting",VB,LL,2,2,2,no,6,A,grey,
 9,Ellie,grey,displacement,no_displacement,control,welsh_corgi,f,yes,1,09/09/2020,17/10/2024,49,no,GR,VB,2,3,2,no,7,A,grey,own food; shorter buckets
 10,Kosmo,blue,no_displacement,displacement,control,welsh_corgi,m,no,1,08/02/2022,17/10/2024,32,no,GR,VB,4,2,3,no,9,A,blue,sausages; shorter buckets
-11,Mable,grey,no_displacement,no_displacement,false_belief,border_collie,f,no,1,28/1/2022,22/10/2024,32,,GR,VB,4,2,2,,8,B,blue,
-12,Zita2,grey,displacement,no_displacement,control,belgian_shepherd,f,no,1,09/06/2015,18/10/2024,112,,GR,CH,2,3,2,1_in_phase_2,7,B,blue,sausages
+11,Mable,grey,no_displacement,no_displacement,false_belief,border_collie,f,no,1,28/1/2022,22/10/2024,32,,GR,VB,4,2,2,no,8,B,blue,
+12,Zita2,grey,displacement,no_displacement,control,belgian_shepherd,f,no,1,09/06/2015,18/10/2024,112,,GR,CH,2,3,2,no,7,B,blue,sausages
 13,Quattro,grey,no_displacement,displacement,control,border_collie,m,no,1,14/01/2024,18/10/2024,9,"obedience, rescue dog",VB,CH,2,2,2,no,6,B,blue,
-14,Massimo,blue,displacement,no_displacement,control,hovawart,m,no,2,10/05/2022,19/10/2024,29,no,GR,VB,4,2,4,"1_in_phase_1, 1_in_phase_3",10,B,grey,sausages
+14,Massimo,blue,displacement,no_displacement,control,hovawart,m,no,2,10/05/2022,19/10/2024,29,no,GR,VB,4,2,4,no,10,B,grey,sausages
 15,Ella4,blue,no_displacement,no_displacement,control,golden_retriever,f,no,8,11/10/2022,21/10/2024,24,no,GR,CH,2,2,2,no,6,B,grey,sausages
 16,Paddy,blue,no_displacement,no_displacement,control,irish_setter,m,no,7,18/03/2017,22/10/2024,91,"mantrailing, obedience, breed_exhibitions, hunting",VB,LL,2,2,2,no,6,A,blue,
 17,Allegro2,blue,no_displacement,displacement,knowledge,border_collie,m,no,1,17/5/2013,12/10/2024,136,,VB,CH,2,2,2,no,6,A,blue,
 18,Saphira4,blue,no_displacement,no_displacement,control,german_shepherd,f,yes,1,11/09/2021,23/10/2024,37,"therapiebegleithund, id_tracking, agility",GR,CH,2,2,2,no,6,B,grey,sausages
-19,,blue,displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
+19,Loomis,blue,displacement,no_displacement,control,golden_retriever,m,no,8,24/09/2020,25/10/2024,49,"mantrailing, cognitive_tasks",GR,VB,4,2,2,no,8,B,grey,sausages
 20,Destino,grey,no_displacement,no_displacement,knowledge,border_collie,m,no,1,21/01/2020,12/10/2024,56,,VB,CH,2,2,2,no,6,A,grey,
-21,Jaguar,grey,no_displacement,no_displacement,knowledge,dutch_shepherd,m,yes,1,08/12/2014,18/10/2024,118,no,GR,VB,3,2,2,1_in_phase_1,7,B,blue,sausages
+21,Jaguar,grey,no_displacement,no_displacement,knowledge,dutch_shepherd,m,yes,1,08/12/2014,18/10/2024,118,no,GR,VB,3,2,2,no,7,B,blue,sausages
 22,Ivy-Infinity,blue,displacement,displacement,false_belief,labrador_retriever,f,yes,8,14/05/2020,20/10/2024,53,mantrailing,GR,VB,2,2,2,no,6,A,blue,
-23,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+23,Fortuna,blue,no_displacement,no_displacement,false_belief,labrador_retriever,f,yes,8,05/05/2017,24/10/2024,89,diabetes_alert_dog,GR,CH,2,3,2,no,7,B,grey,sausages
 24,,blue,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 25,Daisy5,blue,no_displacement,no_displacement,knowledge,golden_retriever,f,no,8,15/05/2020,19/10/2024,53,,GR,VB,3,2,2,no,7,B,grey,sausages
 26,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 27,Thor3,blue,no_displacement,no_displacement,knowledge,welsh_corgi_pembroke,m,yes,1,30/10/2021,19/10/2024,35,tricktraining,GR,VB,4,2,2,no,8,A,blue,
 28,,blue,displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
 29,Frida3,blue,no_displacement,no_displacement,knowledge,australian_shepherd,f,no,1,07/03/2021,22/10/2024,43,"agility, obedience",GR,VB,2,4,2,no,8,B,grey,sausages
-30,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+30,Emma12,blue,no_displacement,no_displacement,false_belief,labrador_retriever,f,,8,08/10/2018,26/10/2024,72,"agility, mantrailing, tricks, therapy assistance",VB,CH,2,2,2,no,6,A,blue,
 31,,grey,displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
-32,,grey,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+32,Bonja,grey,displacement,displacement,knowledge,schnauzer,f,no,2,12/03/2016,24/10/2024,103,hunting,GR,CH,2,2,2,no,6,B,blue,sausages
 33,,blue,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 34,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
-35,,blue,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+35,Ivy6,blue,displacement,displacement,knowledge,australian_shepherd,f,yes,1,01/06/2021,26/10/2024,40,"agility, therapiebegleithund",VB,CH,4,2,2,no,8,A,blue,
 36,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 37,,blue,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
 38,,grey,no_displacement,displacement,false_belief,,,,,,,0,no,,,,,,,0,,,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,2.643274854,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,12.31460674,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. KNOW,6.524390244,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,2.929824561,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,14.12359551,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. KNOW,8.268292683,,,,,,,,,,
