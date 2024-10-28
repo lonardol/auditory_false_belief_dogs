@@ -78,7 +78,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=31)")
+  ggtitle("All breeds (N=33)")
 
 p.choice
  

@@ -22,7 +22,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 21,Jaguar,grey,no_displacement,no_displacement,knowledge,dutch_shepherd,m,yes,1,08/12/2014,18/10/2024,118,no,GR,VB,3,2,2,no,7,B,blue,sausages
 22,Ivy-Infinity,blue,displacement,displacement,false_belief,labrador_retriever,f,yes,8,14/05/2020,20/10/2024,53,mantrailing,GR,VB,2,2,2,no,6,A,blue,
 23,Fortuna,blue,no_displacement,no_displacement,false_belief,labrador_retriever,f,yes,8,05/05/2017,24/10/2024,89,diabetes_alert_dog,GR,CH,2,3,2,no,7,B,grey,sausages
-24,,blue,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
+24,Savvy,blue,displacement,displacement,control,labrador_retriever,f,yes,8,,,0,,GR,VB,2,2,2,no,6,B,grey,
 25,Daisy5,blue,no_displacement,no_displacement,knowledge,golden_retriever,f,no,8,15/05/2020,19/10/2024,53,,GR,VB,3,2,2,no,7,B,grey,sausages
 26,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 27,Thor3,blue,no_displacement,no_displacement,knowledge,welsh_corgi_pembroke,m,yes,1,30/10/2021,19/10/2024,35,tricktraining,GR,VB,4,2,2,no,8,A,blue,
@@ -35,10 +35,10 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 34,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 35,Ivy6,blue,displacement,displacement,knowledge,australian_shepherd,f,yes,1,01/06/2021,26/10/2024,40,"agility, therapiebegleithund",VB,CH,4,2,2,no,8,A,blue,
 36,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
-37,,blue,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+37,Heidi6,blue,displacement,displacement,knowledge,labrador_retriever,f,yes,8,21/10/2022,27/10/2024,24,,,,,,,,0,,,
 38,,grey,no_displacement,displacement,false_belief,,,,,,,0,no,,,,,,,0,,,
 39,,blue,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
-40,,blue,no_displacement,no_displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+40,Balou3,blue,no_displacement,no_displacement,knowledge,brittany_spaniel,m,yes,7,3/2/2016,28/10/2024,104,no,CH,GR,2,2,2,no,6,B,grey,
 41,,grey,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
 42,,blue,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
 43,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
@@ -242,4 +242,4 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 ,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. Ctr,2.929824561,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. FB,14.12359551,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. KNOW,8.268292683,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. KNOW,9.829268293,,,,,,,,,,
