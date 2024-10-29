@@ -16,22 +16,22 @@ library(ggplot2)
 xdata <- read.csv("data/tested_dogs.csv", header = TRUE) %>% 
   na.omit %>% 
   mutate(choice_letter = as.factor(choice_letter)) %>% 
-  mutate(condition = as.factor(condition))
+  mutate(condition = as.factor(condition)) %>% 
+  mutate(age_months=as.numeric(age_months))
 ```
 
-### Plots
-
-
-```{r pressure, echo=FALSE}
-
-#descriptive statistics
+###Descriptive statistics
+```{r}
 ##nr. dogs choosing bucket A and B overall
 table(xdata$choice_letter)
+
 ##proportions relative to the whole sample
 mean(xdata$choice_letter=="A")
 mean(xdata$choice_letter=="B")
+
 ##nr. dogs choosing bucket A and B in each condition
 table(xdata$condition, xdata$choice_letter)
+
 ##proportions relative to the different conditions
 fb_subset <- xdata[xdata$condition == "false_belief", ]
 know_subset <- xdata[xdata$condition == "knowledge", ]
@@ -40,6 +40,21 @@ mean(fb_subset$choice_letter=="A")
 mean(know_subset$choice_letter=="A")
 mean(ctr_subset$choice_letter=="A")
 
+#experimenters (communicator and hider)
+table(xdata$condition, xdata$communicator)
+table(xdata$condition, xdata$hider)
+
+#age
+mean(fb_subset$age_months)
+mean(know_subset$age_months)
+mean(ctr_subset$age_months)
+```
+
+
+### Plots
+
+
+```{r pressure, echo=FALSE}
 #table with descriptive stats for plotting
 plot.data <- xdata %>%
   mutate(choice = ifelse(choice_letter == "A", 1, 0)) %>%
@@ -78,7 +93,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=33)")
+  ggtitle("All breeds (N=39)")
 
 p.choice
  
