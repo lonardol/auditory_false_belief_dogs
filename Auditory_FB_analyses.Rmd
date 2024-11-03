@@ -93,7 +93,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=45)")
+  ggtitle("All breeds (N=50)")
 
 p.choice
  
@@ -150,8 +150,8 @@ plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
 ```{r}
 #chi square test (false belief - knowledge) 29 October
 condition<-c("false belief", "knowledge", "control")
-outcome <- c(9, 5, 5) # number of successes for each condition
-n <- c(14, 13, 13)       # total trials for each condition
+outcome <- plot.data$n.choseA # number of successes (bucket A chosen) for each condition
+n <- plot.data$n.tested.per.cond # total trials for each condition
 
 # Create a contingency table
 table <- matrix(c(outcome[1], n[1] - outcome[1], outcome[2], n[2] - outcome[2], outcome[3], n[3] - outcome[3]), 
