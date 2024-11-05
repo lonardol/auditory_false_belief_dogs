@@ -35,9 +35,9 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 34,Cacho,grey,no_displacement,displacement,control,flatcoated_retriever,m,yes,8,25/5/2018,31/10/2024,77,"mantrailing, hoopers, obedience, fMRI",LL,GR,2,3,2,no,7,B,blue,sausages
 35,Ivy6,blue,displacement,displacement,knowledge,australian_shepherd,f,yes,1,01/06/2021,26/10/2024,40,"agility, therapiebegleithund",VB,CH,4,2,2,no,8,A,blue,
 36,Dali,grey,no_displacement,displacement,control,border_collie,m,no,1,31/10/2024,01/11/2024,0,"rally, dog_dancing, hunting",CH,VB,2,2,2,no,6,A,grey,sausages
-37,Heidi6,blue,displacement,displacement,knowledge,labrador_retriever,f,yes,8,21/10/2022,27/10/2024,24,"therapiebegleithund_in_ausbildung, dummytraining",,,,,,,0,,,
+37,Heidi6,blue,displacement,displacement,knowledge,labrador_retriever,f,yes,8,21/10/2022,27/10/2024,24,"therapiebegleithund_in_ausbildung, dummytraining",GR,VB,,,,,0,A,blue,
 38,Remus,grey,no_displacement,displacement,false_belief,weimaraner,m,no,7,13/01/2024,28/10/2024,9,bgh,GR,VB,4,2,2,no,8,B,blue,
-39,Lotte6,blue,displacement,displacement,control,portuguese_waterdog,f,no,8,29/01/2022,01/11/2024,33,therapiebegleitung,VB,CH,2,2,2,no,6,A,blue,
+39,Lotte6,blue,displacement,displacement,control,portuguese_waterdog,f,no,8,29/01/2022,01/11/2024,33,therapiebegleithund,VB,CH,2,2,2,no,6,A,blue,
 40,Balou3,blue,no_displacement,no_displacement,knowledge,brittany_spaniel,m,yes,7,3/2/2016,28/10/2024,104,no,CH,GR,2,2,2,no,6,B,grey,
 41,Questa,grey,no_displacement,no_displacement,control,deutsch_langhaar,f,no,7,04/04/2022,01/11/2024,30,hunting,CH,VB,2,2,2,no,6,B,blue,
 42,Scully3,blue,displacement,displacement,knowledge,golden_retriever,f,no,8,27/03/2023,28/10/2024,19,,GR,VB,3,2,2,no,7,B,grey,shorter buckets
@@ -45,17 +45,17 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 44,Lotta,grey,no_displacement,displacement,knowledge,romagna_waterdog,f,yes,8,05/10/2018,29/10/2024,72,no,GR,VB,2,2,2,no,6,B,blue,
 45,Chomsky,grey,displacement,no_displacement,false_belief,rottweiler,m,yes,2,17/12/2015,16/10/2024,105,no,VB,CH,2,2,2,no,6,A,grey,
 46,Jaimie,grey,no_displacement,no_displacement,knowledge,border_collie,m,no,1,06/06/2019,30/10/2024,64,"agility, obedience",VB,CH,2,2,2,no,6,A,grey,
-47,,blue,displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
-48,,blue,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
+47,Finley,blue,displacement,no_displacement,control,shetland_sheepdog,m,no,1,17/07/2017,04/11/2024,87,"obedience, dummy_training, mantrailing, rally",LL,GR,4,2,2,no,8,B,grey,shorter buckets
+48,Ben2,blue,displacement,displacement,control,english_springer_spaniel,m,yes,8,07/04/2012,05/11/2024,150,"agility, tricks",CH,VB,2,2,2,no,6,B,grey,"sausages, hearing not perfect "
 49,Zazou3,grey,displacement,no_displacement,knowledge,labrador_retriever,f,,8,23/06/2019,07/10/2024,63,"therapy dog, search_training",VB,LL,2,3,3,no,8,A,grey,
-50,,grey,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+50,Pinu'u,grey,displacement,displacement,knowledge,shetland_sheepdog,m,no,1,29/08/2023,04/11/2024,14,"obedience, mantrailing",LL,GR,2,2,2,no,6,B,blue,shorter buckets
 51,Heidi7,blue,displacement,displacement,false_belief,portuguese_waterdog,f,yes,8,08/10/2018,31/10/2024,72,assistance_dog_training,LL,GR,2,2,2,no,6,B,grey,
 52,Arko2,blue,no_displacement,displacement,knowledge,labrador_retriever,m,yes,8,17/04/2014,31/10/2024,126,no,CH,LL,2,2,2,no,6,B,grey,
 53,Bud,grey,displacement,displacement,false_belief,welsh_corgi_pembroke,m,yes,1,28/03/2024,03/11/2024,7,no,VB,GR,2,2,2,no,6,B,blue,shorter buckets
-54,,grey,no_displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+54,Buddy9,grey,no_displacement,displacement,knowledge,german_short_haired_pointer,m,yes,7,01/06/2018,04/11/2024,77,therapiebegleithund,LL,GR,2,2,4,no,8,B,blue,
 55,Leia3,grey,displacement,displacement,false_belief,welsh_corgi_pembroke,f,yes,1,29/06/2021,03/11/2024,40,no,VB,GR,2,2,2,no,6,A,grey,shorter buckets
-56,,blue,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
-57,,blue,displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+56,Adele,blue,no_displacement,displacement,false_belief,romagna_waterdog,f,no,8,06/06/2020,04/11/2024,52,therapiebegleithund,LL,GR,2,2,2,no,6,B,grey,
+57,Curly2,blue,displacement,no_displacement,false_belief,border_collie,m,,1,13/07/2021,05/11/2024,39,"therapiebegleithund, obedience, dummytraining",CH,VB,2,2,2,no,6,A,blue,own food; hider made 3 noises when hiding in A during the test
 58,,blue,no_displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
 59,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 60,,blue,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,5.052631579,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,17.33707865,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. KNOW,13.25609756,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,6.438596491,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,20.04494382,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. KNOW,14.36585366,,,,,,,,,,

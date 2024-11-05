@@ -93,7 +93,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=50)")
+  ggtitle("All breeds (N=56)")
 
 p.choice
  
@@ -162,4 +162,24 @@ colnames(table) <- c("Success", "Failure")
 # Chi-squared test
 chisq.test(table)
 ```
+```{r}
+#plot with error bars showing confidence intervals 
+plot.data.ci <- plot.data %>%
+  mutate(ci.lower = mean.choiceA - 1.96 * se.choiceA,
+         ci.upper = mean.choiceA + 1.96 * se.choiceA)
+
+# Now, plot with confidence intervals as error bars
+p.choice <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA)) +
+  geom_bar(stat = "identity", alpha = 0.5) +
+  geom_errorbar(aes(ymin = ci.lower, ymax = ci.upper), width = 0.2) +
+  #ylim(0,0.8)+
+  #geom_signif(comparisons=list(c("False Belief", "Knowledge")), annotations="*",
+  #             y_position = 0.75, tip_length = 0.04, vjust=0.4) +
+  theme_classic() +
+  labs(x = "Experimental group", y = "Proportion of bucket A choices") +
+  ggtitle("All breeds (N=53)")
+
+p.choice
+```
+
 
