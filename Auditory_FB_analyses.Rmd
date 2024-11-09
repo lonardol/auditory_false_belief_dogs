@@ -14,10 +14,11 @@ library(ggplot2)
 
 ```{r}
 xdata <- read.csv("data/tested_dogs.csv", header = TRUE) %>% 
-  na.omit %>% 
-  mutate(choice_letter = as.factor(choice_letter)) %>% 
-  mutate(condition = as.factor(condition)) %>% 
-  mutate(age_months=as.numeric(age_months))
+   mutate(choice_letter = as.factor(choice_letter),
+         condition = as.factor(condition),
+         age_months = as.numeric(age_months)) %>% 
+  filter(choice_letter %in% c("A", "B")) %>%   # Keep rows where choice_letter is "A" or "B"
+  droplevels()
 ```
 
 ###Descriptive statistics
@@ -48,6 +49,9 @@ table(xdata$condition, xdata$hider)
 mean(fb_subset$age_months)
 mean(know_subset$age_months)
 mean(ctr_subset$age_months)
+
+#sex
+table(xdata$sex, xdata$condition)
 ```
 
 
@@ -93,7 +97,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, #vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=56)")
+  ggtitle("All breeds (N=65)")
 
 p.choice
  
@@ -120,12 +124,12 @@ mosaic.plot.data  <- xdata %>%
     fct_recode(
       condition,
       "False belief" = "false_belief",
-      "Knowledge" = "knowledge",
-      "Control" = "control"
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
     ),
     "False belief",
-    "Knowledge",
-    "Control"
+    "True Belief",
+    "Sound Control"
   )) #specify order of factor levels for factor_relevel
 
 plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
@@ -177,7 +181,7 @@ p.choice <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA)) +
   #             y_position = 0.75, tip_length = 0.04, vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices") +
-  ggtitle("All breeds (N=53)")
+  ggtitle("All breeds (N=65)")
 
 p.choice
 ```
