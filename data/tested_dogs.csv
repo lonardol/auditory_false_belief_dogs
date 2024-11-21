@@ -83,7 +83,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 82,Bonda,blue,displacement,no_displacement,knowledge,entlebucher_mountain_dog,f,no,2,27/07/2019,17/11/2024,63,"dogdance, fungility",VB,GR,2,2,2,no,6,B,grey,sausages (from trial 2)
 83,Maika,blue,no_displacement,no_displacement,control,austrian_pinscher,f,no,2,03/06/2016,19/11/2024,101,no,GR,LL,2,2,2,no,6,A,blue,small buckets
 84,Ivan,grey,no_displacement,no_displacement,false_belief,beagle,m,no,5,03/05/2021,14/11/2024,42,no,CH,GR,2,2,2,no,6,A,grey,small buckets
-85,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
+85,Harvey,blue,no_displacement,displacement,control,border_collie,m,NA-send_email,1,16/02/2020,19/11/2024,57,"rally_obedience, agility",CH,LL,2,2,2,no,6,B,grey,sausages (from trial 4)
 86,Mila4,grey,no_displacement,no_displacement,false_belief,portuguese_waterdog,f,no,8,10/11/2021,17/11/2024,36,dummy_training,VB,GR,2,2,2,no,6,B,blue,
 87,,grey,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
 88,Priya,grey,displacement,displacement,false_belief,border_collie,f,no,1,19/07/2021,18/11/2021,3,"rettungshund,obedience",CH,VB,3,2,2,no,7,B,blue,
@@ -93,7 +93,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 92,Woody4,blue,displacement,displacement,knowledge,flat_coated_retriever,m,no,8,02/07/2020,19/11/2024,52,trail,LL,VB,2,2,2,no,6,B,grey,
 93,Joey4,blue,no_displacement,displacement,false_belief,border_collie,m,yes,1,30/10/2013,18/11/2024,132,"rettungshund,obedience",CH,VB,2,3,2,no,7,B,grey,
 94,Naya2,grey,displacement,displacement,knowledge,golden_retriever,f,no,8,13/05/2022,19/11/2024,30,"dummy_training, dogdance, trail",LL,VB,4,2,2,no,8,B,blue,sausages
-95,,blue,displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+95,Charly5,blue,displacement,no_displacement,false_belief,spanish_water_dog,m,yes,8,25/08/2016,19/11/2024,98,obedience,CH,LL,4,2,2,no,8,A,blue,
 96,,grey,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 97,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 98,,grey,no_displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,10.69005848,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,25.95505618,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,11.59649123,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,27.05617978,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. KNOW,22.91463415,,,,,,,,,,
