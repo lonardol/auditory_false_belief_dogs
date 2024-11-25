@@ -59,7 +59,6 @@ table(xdata$sex, xdata$condition)
 
 ### Plots
 
-
 ```{r pressure, echo=FALSE}
 #table with descriptive stats for plotting
 plot.data <- xdata %>%
@@ -99,7 +98,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #ylim(0.2,0.6)+
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=91)")
+  ggtitle("All breeds (N=104)")
 
 p.choice
  
@@ -183,7 +182,7 @@ p.choice.ci <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA))
   #             y_position = 0.75, tip_length = 0.04, vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices") +
-  ggtitle("All breeds (N=91)")
+  ggtitle("All breeds (N=104)")
 
 p.choice.ci
 ```

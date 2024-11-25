@@ -61,7 +61,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 60,Noomi2,blue,no_displacement,displacement,false_belief,portuguese_waterdog,f,no,8,10/11/2021,09/11/2024,35,"hoopers, agility",VB,GR,2,2,2,no,6,B,grey,
 61,Gundi,grey,displacement,no_displacement,control,labrador_retriever,f,no,8,21/06/2022,09/11/2024,28,dummy_training,VB,GR,2,2,2,no,6,A,grey,
 62,Edhard,blue,no_displacement,no_displacement,control,danish_swedish_farmdog,m,no,2,01/03/2023,10/11/2024,20,no,VB,GR,2,2,2,no,6,A,blue,"small buckets, sausages"
-63,Garou,grey,displacement,displacement,control,oldgerman_shepherd,m,no,1,09/03/2024,10/11/2024,8,"mantrailing, obedience",VB,GR,5,2,2,no,9,B,blue,"sausages; trial 4 owner points, dog's mistake is attributable to that?"
+63,Garou,grey,displacement,displacement,control,german_shepherd,m,no,1,09/03/2024,10/11/2024,8,"mantrailing, obedience",VB,GR,5,2,2,no,9,B,blue,"sausages; trial 4 owner points, dog's mistake is attributable to that?"
 64,Abby5,blue,displacement,displacement,control,kleiner_muensterlaender,f,no,7,19/08/2021,10/11/2024,38,"dummy, hunting",VB,GR,2,2,2,no,6,A,blue,
 65,Kirsi,blue,displacement,no_displacement,knowledge,portuguese_waterdog,f,no,8,04/06/2023,09/11/2024,17,"hoopers, agility",VB,GR,2,2,2,no,6,A,blue,
 66,Patack,blue,no_displacement,displacement,knowledge,portuguese_waterdog,m,no,8,26/04/2024,09/11/2024,6,no,VB,GR,2,4,3,no,9,A,blue,
@@ -81,30 +81,30 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 80,Onyx,grey,displacement,no_displacement,false_belief,german_shepherd,m,no,1,06/06/2018,12/11/2024,77,obedience,VB,GR,4,2,2,no,8,A,grey,
 81,Brandy2,grey,no_displacement,displacement,knowledge,border_collie,m,yes,1,26/04/2020,15/11/2024,54,obedience,CH,VB,2,2,2,no,6,B,blue,
 82,Bonda,blue,displacement,no_displacement,knowledge,entlebucher_mountain_dog,f,no,2,27/07/2019,17/11/2024,63,"dogdance, fungility",VB,GR,2,2,2,no,6,B,grey,sausages (from trial 2)
-83,Maika,blue,no_displacement,no_displacement,control,austrian_pinscher,f,no,2,03/06/2016,19/11/2024,101,no,GR,LL,2,2,2,no,6,A,blue,small buckets
-84,Ivan,grey,no_displacement,no_displacement,false_belief,beagle,m,no,5,03/05/2021,14/11/2024,42,no,CH,GR,2,2,2,no,6,A,grey,small buckets
-85,Harvey,blue,no_displacement,displacement,control,border_collie,m,NA-send_email,1,16/02/2020,19/11/2024,57,"rally_obedience, agility",CH,LL,2,2,2,no,6,B,grey,sausages (from trial 4)
+83,Maika,blue,no_displacement,no_displacement,control,austrian_pinscher,f,no,2,03/06/2016,19/11/2024,101,no,GR,LL,2,2,2,no,6,A,blue,small buckets; dog distracted during displacement of test trial
+84,Ivan,grey,no_displacement,no_displacement,false_belief,beagle,m,no,6,03/05/2021,14/11/2024,42,no,CH,GR,2,2,2,no,6,A,grey,small buckets
+85,Dasha,blue,no_displacement,displacement,control,bouvier_des_flandres,f,yes,1,23/03/2017,22/11/2024,91,therapiehund,LL,CH,2,2,2,no,6,B,grey,large buckets; sausages
 86,Mila4,grey,no_displacement,no_displacement,false_belief,portuguese_waterdog,f,no,8,10/11/2021,17/11/2024,36,dummy_training,VB,GR,2,2,2,no,6,B,blue,
-87,,grey,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
+87,Toni,grey,no_displacement,no_displacement,control,beagle,f,yes,6,05/05/2017,22/11/2024,90,"fungility, fährtentrainig",CH,LL,2,2,2,no,6,A,grey,sausages
 88,Priya,grey,displacement,displacement,false_belief,border_collie,f,no,1,19/07/2021,18/11/2021,3,"rettungshund,obedience",CH,VB,3,2,2,no,7,B,blue,
-89,Mickey3,blue,displacement,no_displacement,knowledge,beagle,f,yes,5,06/02/2015,17/11/2024,117,no,VB,GR,4,2,2,no,8,A,blue,small buckets
-90,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
-91,,grey,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
+89,Mickey3,blue,displacement,no_displacement,knowledge,beagle,f,yes,6,06/02/2015,17/11/2024,117,no,VB,GR,4,2,2,no,8,A,blue,small buckets
+90,Bugsy,grey,displacement,displacement,control,welsh_corgi_cardigan ,m,yes,1,28/01/2020,23/11/2024,57,no,VB,GR,4,3,2,1_in_phase_2,9,B,blue,"small buckets, sausages"
+91,Nimo,grey,no_displacement,no_displacement,control,border_collie,m,yes,1,21/06/2019,24/11/2024,65,"rally_obedience, agility, herding",GR,CH,4,4,2,no,10,B,blue,
 92,Woody4,blue,displacement,displacement,knowledge,flat_coated_retriever,m,no,8,02/07/2020,19/11/2024,52,trail,LL,VB,2,2,2,no,6,B,grey,
 93,Joey4,blue,no_displacement,displacement,false_belief,border_collie,m,yes,1,30/10/2013,18/11/2024,132,"rettungshund,obedience",CH,VB,2,3,2,no,7,B,grey,
 94,Naya2,grey,displacement,displacement,knowledge,golden_retriever,f,no,8,13/05/2022,19/11/2024,30,"dummy_training, dogdance, trail",LL,VB,4,2,2,no,8,B,blue,sausages
-95,Charly5,blue,displacement,no_displacement,false_belief,spanish_water_dog,m,yes,8,25/08/2016,19/11/2024,98,obedience,CH,LL,4,2,2,no,8,A,blue,
-96,,grey,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
-97,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
-98,,grey,no_displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
-99,,grey,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+95,Charly5,blue,displacement,no_displacement,false_belief,spanish_water_dog,m,yes,8,25/08/2016,20/11/2024,98,obedience,CH,LL,4,2,2,no,8,A,blue,
+96,Ulla,grey,no_displacement,displacement,false_belief,labrador_retriever,f,yes,8,11/02/2017,22/11/2024,93,assistenzhund,LL,CH,2,2,2,no,6,A,grey,
+97,Waleria,blue,no_displacement,no_displacement,false_belief,german_pinscher,f,no,2,12/07/20,23/11/2024,52,"ibgh, rally_obedience, showdog",VB,GR,2,2,2,no,6,A,blue,
+98,Toby2,grey,no_displacement,displacement,knowledge,golden_retriever,m,yes,8,03/06/2013,23/11/2024,137,no,VB,GR,2,2,2,no,6,A,grey,
+99,Gina10,grey,no_displacement,no_displacement,false_belief,silken_windsprite,f,no,10,20/03/2024,24/11/2024,8,no,GR,CH,4,2,2,no,8,B,blue,short buckets
 100,Chester5,grey,displacement,no_displacement,knowledge,border_collie,m,no,1,29/04/2021,19/04/2024,35,mantrailing,VB,GR,4,3,4,no,11,B,blue,owner supplied kibble
-101,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
+101,Finch2,blue,no_displacement,displacement,control,labrador_retriever,m,no,8,23/03/2015,24/11/2024,116,hunting,GR,CH,4,3,3,"1_in_phase_2, 1_in_phase_3",10,B,grey,
 102,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 103,,grey,no_displacement,no_displacement,control,,,,,,,0,,,,,,,,0,,,
-104,,grey,displacement,no_displacement,knowledge,,,,,,,0,,,,,,,,0,,,
-105,,blue,displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
-106,,blue,displacement,no_displacement,knowledge,,,,,,,0,,,,,,,,0,,,
+104,Paulinchen,grey,displacement,no_displacement,knowledge,border_collie,f,no,1,30/04/2024,24/11/2024,6,"therapiebegleithund, mantrailing, obedience",GR,CH,4,2,2,no,8,A,grey,
+105,Enzo2,blue,displacement,no_displacement,false_belief,italian_cane_corso,m,no,2,24/12/2023,24/11/2024,11,no,GR,CH,2,2,4,"1_in_phase_3, 1_in_test",8,0,0,"no choice in test, short buckets, break in phase 3 (overstimulated)"
+106,Papaya,blue,displacement,no_displacement,knowledge,border_collie,f,no,1,23/05/2024,24/11/2024,6,obedience,GR,CH,4,4,2,no,10,B,grey,
 107,,blue,no_displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
 108,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 109,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
@@ -139,7 +139,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 138,,blue,no_displacement,no_displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 139,,grey,displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
 140,,grey,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
-141,,blue,no_displacement,displacement,false_belief,,,,,,,0,,,,,,,,0,,,
+141,Harvey,blue,no_displacement,displacement,false_belief,border_collie,m,NA-send_email,1,16/02/2020,20/11/2024,57,"rally_obedience, agility",CH,LL,2,2,2,no,6,B,grey,sausages (from trial 4)
 142,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 143,,blue,displacement,displacement,knowledge,,,,,,,0,,,,,,,,0,,,
 144,,grey,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,11.59649123,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,27.05617978,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. KNOW,22.91463415,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,15.54385965,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,#REF!,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. KNOW,24.73170732,,,,,,,,,,
