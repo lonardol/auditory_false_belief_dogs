@@ -17,8 +17,10 @@ xdata <- read.csv("data/tested_dogs.csv", header = TRUE) %>%
    mutate(choice_letter = as.factor(choice_letter),
          condition = as.factor(condition),
          age_months = as.numeric(age_months)) %>% 
-  filter(choice_letter %in% c("A", "B")) %>%   # Keep rows where choice_letter is "A" or "B"
+  filter(choice_letter %in% c("A", "B")) %>%   # Keep rows where choice_letter is "A" or "B" in case of NAs
   droplevels()
+
+which(is.na(xdata$choice_letter)) #double check for NAs
 ```
 
 ###Descriptive statistics
@@ -54,6 +56,8 @@ mean(ctr_subset$age_months)
 
 #sex
 table(xdata$sex, xdata$condition)
+table(xdata$FCI_group, xdata$condition)
+table(xdata$condition)
 ```
 
 
@@ -98,7 +102,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #ylim(0.2,0.6)+
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=104)")
+  ggtitle("All breeds (N=119)")
 
 p.choice
  
