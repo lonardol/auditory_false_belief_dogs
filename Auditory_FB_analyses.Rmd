@@ -51,8 +51,13 @@ table(xdata$condition, xdata$experimenter_dyad)
 
 #age
 mean(fb_subset$age_months)
-mean(know_subset$age_months) #check Dali, Bo and Kunibert
+mean(know_subset$age_months) 
 mean(ctr_subset$age_months)
+#how many <2 years in each condition
+sum(fb_subset$age_months<24) #9
+sum(know_subset$age_months<24) #9
+sum(ctr_subset$age_months<24) #5
+
 
 #sex
 table(xdata$sex, xdata$condition)
@@ -102,7 +107,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #ylim(0.2,0.6)+
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=119)")
+  ggtitle("All breeds (N=148)")
 
 p.choice
  
@@ -186,7 +191,7 @@ p.choice.ci <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA))
   #             y_position = 0.75, tip_length = 0.04, vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices") +
-  ggtitle("All breeds (N=104)")
+  ggtitle("All breeds (N=148)")
 
 p.choice.ci
 ```
