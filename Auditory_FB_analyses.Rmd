@@ -3,11 +3,19 @@ title: "Auditory_FB_analyses"
 author: "Lucrezia Lonardo"
 date: "2024-10-22"
 output: html_document
+R_version: 4.2.2
 ---
-### Load libraries
+### Load libraries and custom functions
 ```{r}
+rm(list=ls())
 library(tidyverse)
 library(ggplot2)
+library(lme4)
+library(summarytools)
+library(car)
+source("functions/diagnostic_fcns.r")
+source("functions/glmm_stability.r")
+source("functions/boot_glmm.r")
 ```
 
 ### Import data
@@ -35,7 +43,7 @@ mean(xdata$choice_letter=="B")
 ##nr. dogs choosing bucket A and B in each condition
 table(xdata$condition, xdata$choice_letter)
 
-##proportions relative to the different conditions
+##proportions choices relative to the different conditions
 fb_subset <- xdata[xdata$condition == "false_belief", ]
 know_subset <- xdata[xdata$condition == "knowledge", ]
 ctr_subset <- xdata[xdata$condition == "control", ]
@@ -48,6 +56,8 @@ table(xdata$condition, xdata$communicator)
 table(xdata$condition, xdata$hider)
 xdata$experimenter_dyad<-paste(xdata$communicator, xdata$hider, sep="_")
 table(xdata$condition, xdata$experimenter_dyad)
+#choice and experimenters
+table(xdata$choice_letter, xdata$experimenter_dyad)
 
 #age
 mean(fb_subset$age_months)
@@ -61,8 +71,11 @@ sum(ctr_subset$age_months<24) #5
 
 #sex
 table(xdata$sex, xdata$condition)
+#FCI group
 table(xdata$FCI_group, xdata$condition)
 table(xdata$condition)
+#choice and FCI group
+table(xdata$choice_letter, xdata$FCI_group)
 ```
 
 
@@ -162,7 +175,7 @@ plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
 # )
 ```
 ```{r}
-#chi square test (false belief - knowledge) 29 October
+#chi square test (false belief - knowledge) 
 condition<-c("false belief", "knowledge", "control")
 outcome <- plot.data$n.choseA # number of successes (bucket A chosen) for each condition
 n <- plot.data$n.tested.per.cond # total trials for each condition
@@ -195,5 +208,131 @@ p.choice.ci <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA))
 
 p.choice.ci
 ```
+### Preparing data for modelling
+```{r}
+model.data<-xdata %>% 
+  #making sure factors are treated as such
+  mutate(dog_ID=as.factor(dog_ID)) %>% 
+  mutate(breed=as.factor(breed)) %>% 
+  mutate(sex=as.factor(sex)) %>% 
+  mutate(first_baited_box=as.factor(first_bucket_A)) %>% 
+  select(-first_bucket_A) %>% 
+  mutate(FCI_group=as.factor(FCI_group)) %>% 
+  mutate(experience_in_dog_sport=as.factor(experience_in_dog_sport)) %>%
+  mutate(hider=as.factor(hider)) %>%
+  mutate(communicator=as.factor(communicator)) %>%
+  mutate(experimenter_dyad=as.factor(experimenter_dyad)) %>%
+  mutate(choice_colour=as.factor(choice_colour)) %>% 
+  #centering variables
+  mutate(z.age = as.numeric(scale(age_months, scale = T, center = T)), #age scaled and centered (=z-transformed, we subtracted the mean and divided by SD)
+         sex.c = as.numeric(scale(as.numeric(as.factor(sex)), scale=F, center=T)), #factors manually dummy coded and centered (i.e., we subtracted the mean value from each observed value)
+         condition.c = as.numeric(scale(as.numeric(as.factor(condition)), scale=F, center=T)),
+         first_baited_box.c = as.numeric(scale(as.numeric(as.factor(first_baited_box)), scale=F, center=T)))
 
 
+
+view(dfSummary(model.data))
+
+summary(model.data$age_months) #23rd December 2024: mean age: 61 months (ca. 5 years); min age: 6 months; max age: 155 months (12.9 years)
+#which(model.data$age_months>156) #check in case the distribution has unlikely outliers.
+
+#checking familiarisation performance is as expected (max 4 trials per phase)
+which(model.data$nr_fam_phase1_trials==5) #there is one exception: Garou because one trial in phase 1 had to be repeated due to owner's mistake
+
+#checking no choice trials
+which(model.data$no_choice_trials=='')
+#Heidi6's familiarisation performance was not reported in the data file. Please correct.
+which(model.data$no_choice_trials=="1_in_testtrial")
+
+#checking which breeds we have
+unique(levels(model.data$breed)) #some levels are redundant (e.g. schanuzer and giant schnauzer; belgian shepherd and malinois), so let's reduce unnecessary variation between breeds
+
+
+model.data <- model.data %>% 
+  mutate(breed_recoded = case_when(
+    breed == "malinois" | breed == "laekenois" ~ "belgian_shepherd",
+    breed == "giant_schnauzer" ~ "schnauzer",
+    grepl("corgi", breed) ~ "welsh_corgi",
+    TRUE ~ as.character(breed) # Preserve original values as character
+  ),
+  breed_recoded = as.factor(breed_recoded))
+
+#check new levels of breed 
+unique(levels(model.data$breed_recoded)) #45 different breeds
+#what is a miniature american shepherd? Not in FCI!
+
+#checking if the data preparations worked as expected
+str(model.data)
+```
+### GLMM 01: Model with breed as random intercept 
+
+```{r eval=FALSE, echo=FALSE}
+xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition + age_months + sex + first_baited_box",
+                   re="(1|breed_recoded)", data=model.data)
+xx.fe.re$summary
+
+#exclude all rs within breed at least for now until we have all data?
+```
+
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. Right now (23 December 2024), we don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+# full.choice.breed <- glmer(choice_letter ~ condition + z.age + sex + first_baited_box+
+#              (1+ sex.c + condition.c + first_baited_box.c + z.age | breed.recoded), 
+#              data = model.data, family = binomial, 
+#              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+# )
+
+full.choice.breed <- glmer(choice_letter ~ condition + z.age + sex + first_baited_box+
+             (1 + condition.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             data = model.data, family = binomial, 
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+```
+
+#### Distribution of BLUPs
+```{r}
+ranef.diagn.plot(full.choice.breed)
+```
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.breed)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full=drop1(full.choice.breed, test="Chisq")
+round(drop1.full,3)
+```
+```{r}
+summary(full.choice.breed)$varcor
+```
+#### confidence intervals
+
+```{r}
+boot.res=boot.glmm.pred(model.res=full.choice.breed, excl.warnings=T,
+	nboots=1000, para=T)
+res<-round(boot.res$ci.estimates, 3)
+res
+```
+#### model stability
+
+```{r eval=FALSE, include=FALSE}
+
+# One breed at a time excluded to assess the impact of possible outliers 
+m.stab.b <- glmm.model.stab(model.res = full.choice.breed, use = c("breed_recoded"))
+
+table(m.stab.b$detailed$lme4.warnings) #some models failed to converge
+
+xx <- as.data.frame(round(m.stab.b$summary[, -1], 3))
+#table with model stability
+xx
+
+#plot of stability (remember to execute all three lines at the same time)
+png("plots/bin_glmm01_choice_stability.png")
+m.stab.plot(round(m.stab.b$summary[, -1], 3))
+dev.off()
+```

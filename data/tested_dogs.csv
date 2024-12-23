@@ -86,7 +86,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 85,Dasha,blue,no_displacement,displacement,control,bouvier_des_flandres,f,yes,1,23/03/2017,22/11/2024,91,therapiehund,LL,CH,2,2,2,no,6,B,grey,large buckets; sausages
 86,Mila4,grey,no_displacement,no_displacement,false_belief,portuguese_waterdog,f,no,8,10/11/2021,17/11/2024,36,dummy_training,VB,GR,2,2,2,no,6,B,blue,
 87,Toni,grey,no_displacement,no_displacement,control,beagle,f,yes,6,05/05/2017,22/11/2024,90,"fungility, fährtentrainig",CH,LL,2,2,2,no,6,A,grey,sausages
-88,Priya,grey,displacement,displacement,false_belief,border_collie,f,no,1,19/07/2021,18/11/2021,3,"rettungshund,obedience",CH,VB,3,2,2,no,7,B,blue,
+88,Priya,grey,displacement,displacement,false_belief,border_collie,f,no,1,19/07/2021,18/11/2024,39,"rettungshund,obedience",CH,VB,3,2,2,no,7,B,blue,
 89,Mickey3,blue,displacement,no_displacement,knowledge,beagle,f,yes,6,06/02/2015,17/11/2024,117,no,VB,GR,4,2,2,no,8,A,blue,small buckets
 90,Bugsy,grey,displacement,displacement,control,welsh_corgi_cardigan ,m,yes,1,28/01/2020,23/11/2024,57,no,VB,GR,4,3,2,1_in_phase_2,9,B,blue,"small buckets, sausages"
 91,Nimo,grey,no_displacement,no_displacement,control,border_collie,m,yes,1,21/06/2019,24/11/2024,65,"rally_obedience, agility, herding",GR,CH,4,4,2,no,10,B,blue,
@@ -115,7 +115,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 114,Madoc,blue,displacement,displacement,false_belief,welsh_corgi_pembroke,m,yes,1,07/10/2014,06/12/2024,121,no,GR,VB,2,4,2,no,8,B,grey,small buckets
 115,Lilly17,grey,no_displacement,displacement,false_belief,welsh_corgi_pembroke,f,no,1,02/06/2021,08/12/2024,42,no,GR,VB,2,3,2,no,7,B,blue,small buckets
 116,Juri,grey,no_displacement,displacement,false_belief,labrador_retriever,m,yes,1,16/08/2021,11/12/2024,39,signaldog,GR,VB,2,2,2,no,6,A,grey,
-117,Lenny4,grey,displacement,no_displacement,control,canarian_warrenhound,m,yes,5,15/07/2004,30/11/2024,244,"obedience, dogdiving, frisbee, wasserarbeit",GR,VB,2,2,2,no,6,B,blue,
+117,Lenny4,grey,displacement,no_displacement,control,canarian_warrenhound,m,yes,5,15/07/2014,30/11/2024,124,"obedience, dogdiving, frisbee, wasserarbeit",GR,VB,2,2,2,no,6,B,blue,
 118,Holly10,blue,no_displacement,displacement,control,bernese_mountaindog,f,yes,2,03/05/2019,01/12/2024,66,therapiebegleithund,CH,VB,2,2,2,no,6,B,grey,
 119,NaNu,grey,no_displacement,no_displacement,false_belief,hovawart,f,no,2,13/07/2021,01/12/2024,40,"obedience, mantrailing",VB,CH,2,2,2,no,6,A,grey,
 120,Pauli6,grey,displacement,no_displacement,control,labrador_retriever,m,yes,8,21/7/2021,11/12/2024,40,signaldog,GR,VB,2,2,4,no,8,B,blue,
@@ -240,6 +240,6 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 239,,grey,displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 240,,blue,no_displacement,displacement,control,,,,,,,0,,,,,,,,0,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. Ctr,43.98913043,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,40.35555556,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. Ctr,42.68478261,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,40.75555556,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. KNOW,38.58064516,,,,,,,,,,
