@@ -33,6 +33,7 @@ which(is.na(xdata$choice_letter)) #double check for NAs
 
 ###Descriptive statistics
 ```{r}
+table(xdata$condition)
 ##nr. dogs choosing bucket A and B overall
 table(xdata$choice_letter)
 
@@ -61,21 +62,37 @@ table(xdata$choice_letter, xdata$experimenter_dyad)
 
 #age
 mean(fb_subset$age_months)
-mean(know_subset$age_months) 
+mean(know_subset$age_months, na.rm=T) 
 mean(ctr_subset$age_months)
 #how many <2 years in each condition
-sum(fb_subset$age_months<24) #9
-sum(know_subset$age_months<24) #9
-sum(ctr_subset$age_months<24) #5
+sum(fb_subset$age_months<24) #8
+sum(know_subset$age_months<24) #12
+sum(ctr_subset$age_months<24) #6
 
 
 #sex
 table(xdata$sex, xdata$condition)
 #FCI group
 table(xdata$FCI_group, xdata$condition)
-table(xdata$condition)
 #choice and FCI group
 table(xdata$choice_letter, xdata$FCI_group)
+
+#breed recoded
+xdata <- xdata %>% 
+  mutate(breed_recoded = case_when(
+    breed == "malinois" | breed == "laekenois" ~ "belgian_shepherd",
+    breed == "giant_schnauzer" ~ "schnauzer",
+    grepl("corgi", breed) ~ "welsh_corgi",
+    TRUE ~ as.character(breed) # Preserve original values as character
+  ),
+  breed_recoded = as.factor(breed_recoded))
+
+#check new levels of breed 
+unique(levels(xdata$breed_recoded)) #46 breeds
+
+#breed
+table(xdata$condition, xdata$breed_recoded)
+#table(xdata$breed_recoded, xdata$sex)
 ```
 
 
@@ -106,8 +123,6 @@ plot.data <- xdata %>%
     se.choiceA = sd(choice) / sqrt(length(choice))
   )
 
-plot.data
-
 ##barplot of choices by experimental group
 
 p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
@@ -120,7 +135,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #ylim(0.2,0.6)+
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=148)")
+  ggtitle("All breeds (N=189)")
 
 p.choice
  
@@ -155,14 +170,15 @@ mosaic.plot.data  <- xdata %>%
     "Sound Control"
   )) #specify order of factor levels for factor_relevel
 
+png("./plots/mosaic_choices_189_dogs.png")
 plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
   xlab = "Condition",
   ylab = "Bucket chosen")
-
+dev.off()
 
 #saving the plot with ggsave
 # ggsave(
-#   "./graphs/bucket_A_choices_BC.png",
+#   "./plots/mosaic_choices_168_dogs.png",
 #   plot = last_plot(),
 #   device = NULL,
 #  # path = "C:/Users/lonardol/Desktop/False Belief experiment/FB_2_follow_up/Graphs/Border Collies",
@@ -175,20 +191,46 @@ plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
 # )
 ```
 ```{r}
-#chi square test (false belief - knowledge) 
+#add column with independent vs cooperative breeds distinction 
+xdata<-xdata %>% 
+  mutate(breed_type = ifelse(FCI_group %in% c("1", "2", "7", "8"), "cooperative", "independent"))
+
+table(xdata$breed_type)
+
+table(xdata$choice_letter, xdata$breed_type, xdata$condition)
+
+#add column with experience in dogs sport as binary (yes/no) variable
+xdata<-xdata %>% 
+  mutate(training = ifelse(experience_in_dog_sport=="no", "no", "yes"))
+
+table(xdata$training)
+
+table(xdata$FCI_group[xdata$training=="no"])
+
+table(xdata$choice_letter, xdata$training, xdata$condition)
+
+#experimenter ID
+
+table(xdata$communicator, xdata$choice_letter, xdata$condition)
+```
+
+
+```{r}
+#OLD: chi square test (false belief - knowledge) 
 condition<-c("false belief", "knowledge", "control")
-outcome <- plot.data$n.choseA # number of successes (bucket A chosen) for each condition
-n <- plot.data$n.tested.per.cond # total trials for each condition
+chose_A <- plot.data$n.choseA # number of successes (bucket A chosen) for each condition
+n.per.cond <- plot.data$n.tested.per.cond # total trials for each condition
 
 # Create a contingency table
-table <- matrix(c(outcome[1], n[1] - outcome[1], outcome[2], n[2] - outcome[2], outcome[3], n[3] - outcome[3]), 
+table <- matrix(c(chose_A[1], n.per.cond[1] - chose_A[1], chose_A[2], n.per.cond[2] - chose_A[2], chose_A[3], n.per.cond[3] - chose_A[3]), 
                 nrow = 3, byrow = TRUE)
 rownames(table) <- condition
-colnames(table) <- c("Success", "Failure")
+colnames(table) <- c("Chose A", "Chose B")
 
 # Chi-squared test
 chisq.test(table)
 ```
+
 ```{r}
 #plot with error bars showing confidence intervals 
 plot.data.ci <- plot.data %>%
@@ -208,6 +250,16 @@ p.choice.ci <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA))
 
 p.choice.ci
 ```
+###proportion tests
+```{r}
+
+# Perform the Chi-square test for homogeneity (comparing proportions across three groups):
+result <- prop.test(chose_A, n.per.cond)
+
+# View the result
+result
+```
+
 ### Preparing data for modelling
 ```{r}
 model.data<-xdata %>% 
@@ -336,3 +388,10 @@ png("plots/bin_glmm01_choice_stability.png")
 m.stab.plot(round(m.stab.b$summary[, -1], 3))
 dev.off()
 ```
+## Inter-coder reliability for binary variable
+```{r}
+#define random videos to be coded (25% of final sample size=60 videos)
+set.seed(43) #for reproducibility
+sample(c(1:240), 60)
+```
+
