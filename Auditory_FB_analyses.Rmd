@@ -13,6 +13,9 @@ library(ggplot2)
 library(lme4)
 library(summarytools)
 library(car)
+library(writexl)
+library(readxl)
+library(irr)
 source("functions/diagnostic_fcns.r")
 source("functions/glmm_stability.r")
 source("functions/boot_glmm.r")
@@ -41,11 +44,14 @@ table(xdata$choice_letter)
 mean(xdata$choice_letter=="A")
 mean(xdata$choice_letter=="B")
 
+#binomial test to check if proportion of choice A and B differ significantly overall across conditions
+binom.test(101, 240, p=0.5)
+
 ##nr. dogs choosing bucket A and B in each condition
 table(xdata$condition, xdata$choice_letter)
 
 ##proportions choices relative to the different conditions
-fb_subset <- xdata[xdata$condition == "false_belief", ]
+fb_subset <- xdata[xdata$condition == "false_belief",]
 know_subset <- xdata[xdata$condition == "knowledge", ]
 ctr_subset <- xdata[xdata$condition == "control", ]
 mean(fb_subset$choice_letter=="A")
@@ -61,16 +67,19 @@ table(xdata$condition, xdata$experimenter_dyad)
 table(xdata$choice_letter, xdata$experimenter_dyad)
 
 #age
+range(xdata$age)
+mean(xdata$age)
 mean(fb_subset$age_months)
 mean(know_subset$age_months, na.rm=T) 
 mean(ctr_subset$age_months)
 #how many <2 years in each condition
-sum(fb_subset$age_months<24) #8
-sum(know_subset$age_months<24) #12
-sum(ctr_subset$age_months<24) #6
+sum(fb_subset$age_months<24) #9
+sum(know_subset$age_months<24, na.rm=T) #15
+sum(ctr_subset$age_months<24) #7
 
 
 #sex
+table(xdata$sex)
 table(xdata$sex, xdata$condition)
 #FCI group
 table(xdata$FCI_group, xdata$condition)
@@ -82,17 +91,24 @@ xdata <- xdata %>%
   mutate(breed_recoded = case_when(
     breed == "malinois" | breed == "laekenois" ~ "belgian_shepherd",
     breed == "giant_schnauzer" ~ "schnauzer",
+    breed == "deutsch_langhaar" ~ "german_longhaired_pointer",
+    breed == "samojede" ~ "samoyed",
     grepl("corgi", breed) ~ "welsh_corgi",
     TRUE ~ as.character(breed) # Preserve original values as character
   ),
   breed_recoded = as.factor(breed_recoded))
 
 #check new levels of breed 
-unique(levels(xdata$breed_recoded)) #46 breeds
+unique(levels(xdata$breed_recoded)) #61 breeds
 
 #breed
 table(xdata$condition, xdata$breed_recoded)
 #table(xdata$breed_recoded, xdata$sex)
+unique(levels(xdata$breed_recoded))
+
+#food
+sum(grepl(c("sausages"), xdata$notes))
+sum(grepl(c("own food"), xdata$notes))
 ```
 
 
@@ -113,7 +129,7 @@ plot.data <- xdata %>%
     "knowledge",
     "control"
   )) %>% #specify order of factor levels for factor_relevel
-  group_by(condition) %>%
+  group_by(condition) %>% 
   summarise(
     mean.choiceA = mean(choice),
     sd.choiceA = sd(choice),
@@ -135,7 +151,7 @@ p.choice <- ggplot(data = plot.data, aes(x = condition, y = mean.choiceA)) +
   #ylim(0.2,0.6)+
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices")+
-  ggtitle("All breeds (N=189)")
+  ggtitle("All breeds (N=240)")
 
 p.choice
  
@@ -170,7 +186,7 @@ mosaic.plot.data  <- xdata %>%
     "Sound Control"
   )) #specify order of factor levels for factor_relevel
 
-png("./plots/mosaic_choices_189_dogs.png")
+png("./plots/mosaic_choices_240_dogs.png")
 plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
   xlab = "Condition",
   ylab = "Bucket chosen")
@@ -210,25 +226,235 @@ table(xdata$FCI_group[xdata$training=="no"])
 table(xdata$choice_letter, xdata$training, xdata$condition)
 
 #experimenter ID
-
 table(xdata$communicator, xdata$choice_letter, xdata$condition)
 ```
-
-
+### Plot breed performance
 ```{r}
-#OLD: chi square test (false belief - knowledge) 
-condition<-c("false belief", "knowledge", "control")
-chose_A <- plot.data$n.choseA # number of successes (bucket A chosen) for each condition
-n.per.cond <- plot.data$n.tested.per.cond # total trials for each condition
+#breed_type data
+cooperative_data<-xdata %>% 
+  filter(breed_type!="independent")
+independent_data<-xdata %>% 
+  filter(breed_type!="cooperative")
 
-# Create a contingency table
-table <- matrix(c(chose_A[1], n.per.cond[1] - chose_A[1], chose_A[2], n.per.cond[2] - chose_A[2], chose_A[3], n.per.cond[3] - chose_A[3]), 
-                nrow = 3, byrow = TRUE)
-rownames(table) <- condition
-colnames(table) <- c("Chose A", "Chose B")
+#mosaic plot for cooperative
+mosaic.cooperative.plot.data  <- cooperative_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
 
-# Chi-squared test
-chisq.test(table)
+png("./plots/mosaic_choices_206_dogs_cooperative.png")
+plot(mosaic.cooperative.plot.data$condition,mosaic.cooperative.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "Cooperative breeds" )
+dev.off()
+
+#mosaic plot for independent
+mosaic.independent.plot.data  <- independent_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/mosaic_choices_206_dogs_independent.png")
+plot(mosaic.independent.plot.data$condition,mosaic.independent.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "Independent breeds" )
+dev.off()
+
+#subset the data to the different FCI groups
+FCI1_data<-xdata %>% 
+  filter(FCI_group=="1")
+
+FCI2_data<-xdata %>% 
+  filter(FCI_group=="2")
+
+FCI5_data<-xdata %>% 
+  filter(FCI_group=="5")
+
+FCI6_data<-xdata %>% 
+  filter(FCI_group=="6")
+
+FCI7_data<-xdata %>% 
+  filter(FCI_group=="7")
+
+FCI8_data<-xdata %>% 
+  filter(FCI_group=="8")
+
+FCI10_data<-xdata %>% 
+  filter(FCI_group=="10")
+
+# mosaic plot for FCI group 1
+mosaic.FCI1.plot.data  <- FCI1_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI1.png")
+plot(mosaic.FCI1.plot.data$condition, mosaic.FCI1.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 1 (N=84)" )
+dev.off()
+
+# mosaic plot for FCI group 2
+mosaic.FCI2.plot.data  <- FCI2_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI2.png")
+plot(mosaic.FCI5.plot.data$condition, mosaic.FCI5.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 2 (N=11)" )
+dev.off()
+
+# mosaic plot for FCI group 5
+mosaic.FCI5.plot.data  <- FCI5_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI5.png")
+plot(mosaic.FCI5.plot.data$condition, mosaic.FCI5.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 5 (N=11)" )
+dev.off()
+
+# mosaic plot for FCI group 6
+mosaic.FCI6.plot.data  <- FCI6_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI6.png")
+plot(mosaic.FCI6.plot.data$condition, mosaic.FCI6.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 6 (N=6)" )
+dev.off()
+
+# mosaic plot for FCI group 7
+mosaic.FCI7.plot.data  <- FCI7_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI7.png")
+plot(mosaic.FCI7.plot.data$condition, mosaic.FCI7.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 7 (N=13)" )
+dev.off()
+
+# mosaic plot for FCI group 8
+mosaic.FCI8.plot.data  <- FCI8_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI8.png")
+plot(mosaic.FCI8.plot.data$condition, mosaic.FCI8.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 8 (N=64)" )
+dev.off()
+
+# mosaic plot for FCI group 10
+mosaic.FCI10.plot.data  <- FCI10_data %>%
+  mutate(choice_letter = fct_relevel(choice_letter, "B", "A")) %>%
+  mutate(condition = fct_relevel(
+    fct_recode(
+      condition,
+      "False belief" = "false_belief",
+      "True Belief" = "knowledge",
+      "Sound Control" = "control"
+    ),
+    "False belief",
+    "True Belief",
+    "Sound Control"
+  )) #specify order of factor levels for factor_relevel
+
+png("./plots/FCI_groups/mosaic_choices_206_dogs_FCI10.png")
+plot(mosaic.FCI10.plot.data$condition, mosaic.FCI10.plot.data$choice_letter,
+  xlab = "Condition",
+  ylab = "Bucket chosen",
+  main = "FCI group 10 (N=6)" )
+dev.off()
 ```
 
 ```{r}
@@ -246,18 +472,9 @@ p.choice.ci <- ggplot(data = plot.data.ci, aes(x = condition, y = mean.choiceA))
   #             y_position = 0.75, tip_length = 0.04, vjust=0.4) +
   theme_classic() +
   labs(x = "Experimental group", y = "Proportion of bucket A choices") +
-  ggtitle("All breeds (N=148)")
+  ggtitle("All breeds (N=240)")
 
 p.choice.ci
-```
-###proportion tests
-```{r}
-
-# Perform the Chi-square test for homogeneity (comparing proportions across three groups):
-result <- prop.test(chose_A, n.per.cond)
-
-# View the result
-result
 ```
 
 ### Preparing data for modelling
@@ -266,11 +483,13 @@ model.data<-xdata %>%
   #making sure factors are treated as such
   mutate(dog_ID=as.factor(dog_ID)) %>% 
   mutate(breed=as.factor(breed)) %>% 
+  mutate(breed_recoded=as.factor(breed_recoded)) %>% 
+  mutate(breed_type=as.factor(breed_type)) %>% 
   mutate(sex=as.factor(sex)) %>% 
   mutate(first_baited_box=as.factor(first_bucket_A)) %>% 
   select(-first_bucket_A) %>% 
   mutate(FCI_group=as.factor(FCI_group)) %>% 
-  mutate(experience_in_dog_sport=as.factor(experience_in_dog_sport)) %>%
+  mutate(training=as.factor(training)) %>%
   mutate(hider=as.factor(hider)) %>%
   mutate(communicator=as.factor(communicator)) %>%
   mutate(experimenter_dyad=as.factor(experimenter_dyad)) %>%
@@ -279,39 +498,26 @@ model.data<-xdata %>%
   mutate(z.age = as.numeric(scale(age_months, scale = T, center = T)), #age scaled and centered (=z-transformed, we subtracted the mean and divided by SD)
          sex.c = as.numeric(scale(as.numeric(as.factor(sex)), scale=F, center=T)), #factors manually dummy coded and centered (i.e., we subtracted the mean value from each observed value)
          condition.c = as.numeric(scale(as.numeric(as.factor(condition)), scale=F, center=T)),
-         first_baited_box.c = as.numeric(scale(as.numeric(as.factor(first_baited_box)), scale=F, center=T)))
+         breed_type.c = as.numeric(scale(as.numeric(as.factor(breed_type)), scale=F, center=T)),
+         first_baited_box.c = as.numeric(scale(as.numeric(as.factor(first_baited_box)), scale=F, center=T)),
+         training.c = as.numeric(scale(as.numeric(as.factor(training)), scale=F, center=T)))
 
 
 
 view(dfSummary(model.data))
 
-summary(model.data$age_months) #23rd December 2024: mean age: 61 months (ca. 5 years); min age: 6 months; max age: 155 months (12.9 years)
-#which(model.data$age_months>156) #check in case the distribution has unlikely outliers.
+summary(model.data$age_months)
 
 #checking familiarisation performance is as expected (max 4 trials per phase)
-which(model.data$nr_fam_phase1_trials==5) #there is one exception: Garou because one trial in phase 1 had to be repeated due to owner's mistake
+which(model.data$nr_fam_phase1_trials>4) #there is one exception: Garou because one trial in phase 1 had to be repeated due to owner's mistake
 
 #checking no choice trials
 which(model.data$no_choice_trials=='')
 #Heidi6's familiarisation performance was not reported in the data file. Please correct.
 which(model.data$no_choice_trials=="1_in_testtrial")
 
-#checking which breeds we have
-unique(levels(model.data$breed)) #some levels are redundant (e.g. schanuzer and giant schnauzer; belgian shepherd and malinois), so let's reduce unnecessary variation between breeds
-
-
-model.data <- model.data %>% 
-  mutate(breed_recoded = case_when(
-    breed == "malinois" | breed == "laekenois" ~ "belgian_shepherd",
-    breed == "giant_schnauzer" ~ "schnauzer",
-    grepl("corgi", breed) ~ "welsh_corgi",
-    TRUE ~ as.character(breed) # Preserve original values as character
-  ),
-  breed_recoded = as.factor(breed_recoded))
-
 #check new levels of breed 
-unique(levels(model.data$breed_recoded)) #45 different breeds
-#what is a miniature american shepherd? Not in FCI!
+unique(levels(model.data$breed_recoded)) #61 different breeds
 
 #checking if the data preparations worked as expected
 str(model.data)
@@ -322,31 +528,125 @@ str(model.data)
 xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition + age_months + sex + first_baited_box",
                    re="(1|breed_recoded)", data=model.data)
 xx.fe.re$summary
+```
 
-#exclude all rs within breed at least for now until we have all data?
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. We don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+full.choice <- glmer(choice_letter ~ condition + z.age + sex + first_baited_box+
+             (1 + condition.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             data = model.data, family = binomial, 
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+```
+#### Variance Inflation Factors
+```{r}
+vif(full.choice) #collinearity is no problem
+```
+
+#### Distribution of BLUPs
+```{r}
+ranef.diagn.plot(full.choice)
+```
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full=drop1(full.choice, test="Chisq")
+round(drop1.full,3)
+```
+```{r}
+summary(full.choice)$varcor
+```
+#### confidence intervals
+
+```{r}
+boot.res=boot.glmm.pred(model.res=full.choice, excl.warnings=T,
+	nboots=1000, para=T)
+res<-round(boot.res$ci.estimates, 3)
+res
+```
+#### model stability
+
+```{r eval=FALSE, include=FALSE}
+
+# One breed at a time excluded to assess the impact of possible outliers 
+m.stab.b <- glmm.model.stab(model.res = full.choice, use = c("breed_recoded"))
+
+table(m.stab.b$detailed$lme4.warnings) #some models failed to converge
+
+xx <- as.data.frame(round(m.stab.b$summary[, -1], 3))
+#table with model stability
+xx
+
+#plot of stability (execute all three lines at the same time)
+png("plots/bin_glmm01_choice_stability.png")
+m.stab.plot(round(m.stab.b$summary[, -1], 3))
+dev.off()
+```
+
+
+### GLMM 02: Model with interaction breed_type(coop. vs indep.) * condition (Exploratory)
+
+```{r eval=FALSE, echo=FALSE}
+xx.fe.re=fe.re.tab(fe.model="choice_letter ~ breed_type*condition + age_months + sex + first_baited_box",
+                   re="(1|breed_recoded)", data=model.data)
+xx.fe.re$summary
 ```
 
 ``` {r mixed modeling, error=TRUE}
 #full model with all rs within breed. Right now (23 December 2024), we don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
 
-# full.choice.breed <- glmer(choice_letter ~ condition + z.age + sex + first_baited_box+
-#              (1+ sex.c + condition.c + first_baited_box.c + z.age | breed.recoded), 
-#              data = model.data, family = binomial, 
-#              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
-# )
-
-full.choice.breed <- glmer(choice_letter ~ condition + z.age + sex + first_baited_box+
-             (1 + condition.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
-             data = model.data, family = binomial, 
+full.choice.int <- glmer(choice_letter ~ condition*breed_type + z.age + sex + first_baited_box+
+             (1+ sex.c + condition.c*breed_type.c + first_baited_box.c + z.age || breed_recoded),
+             data = model.data, family = binomial,
              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
 )
+
+#had to exclude correlation parameters between rss and icpt because they were unidentifiable
+```
+
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.int)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full=drop1(full.choice.int, test="Chisq")
+round(drop1.full,3)
+#interaction not significant
+```
+####the interaction condition*breed_type is not significant, so we remove it but keep both main effects
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. Right now (23 December 2024), we don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+full.choice.breed <- glmer(choice_letter ~ condition + breed_type + z.age + sex + first_baited_box+
+             (1+ sex.c + condition.c + breed_type.c + first_baited_box.c + z.age || breed_recoded),
+             data = model.data, family = binomial,
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+
+#had to exclude correlation parameters between rss and icpt because they were unidentifiable
+```
+#### Variance Inflation Factors
+```{r}
+vif(full.choice.breed) #collinearity is no problem
 ```
 
 #### Distribution of BLUPs
 ```{r}
 ranef.diagn.plot(full.choice.breed)
 ```
-
 #### model output
   + Coefficients
 ```{r}
@@ -358,40 +658,153 @@ Drop1: P values for the individual effects were based on likelihood ratio tests 
 ```{r}
 drop1.full=drop1(full.choice.breed, test="Chisq")
 round(drop1.full,3)
-```
-```{r}
-summary(full.choice.breed)$varcor
+#the interaction condition*breed_type is not significant, so we remove it but keep both main effects
 ```
 #### confidence intervals
 
 ```{r}
-boot.res=boot.glmm.pred(model.res=full.choice.breed, excl.warnings=T,
+boot.res.breed=boot.glmm.pred(model.res=full.choice.breed, excl.warnings=T,
 	nboots=1000, para=T)
-res<-round(boot.res$ci.estimates, 3)
-res
+res.breed<-round(boot.res.breed$ci.estimates, 3)
+res.breed
 ```
 #### model stability
 
 ```{r eval=FALSE, include=FALSE}
 
 # One breed at a time excluded to assess the impact of possible outliers 
-m.stab.b <- glmm.model.stab(model.res = full.choice.breed, use = c("breed_recoded"))
+m.stab.breed <- glmm.model.stab(model.res = full.choice.breed, use = c("breed_recoded"))
 
-table(m.stab.b$detailed$lme4.warnings) #some models failed to converge
+table(m.stab.breed$detailed$lme4.warnings) #several models failed to converge
 
-xx <- as.data.frame(round(m.stab.b$summary[, -1], 3))
+xx.breed <- as.data.frame(round(m.stab.b$summary[, -1], 3))
 #table with model stability
-xx
+xx.breed
 
 #plot of stability (remember to execute all three lines at the same time)
-png("plots/bin_glmm01_choice_stability.png")
-m.stab.plot(round(m.stab.b$summary[, -1], 3))
+png("plots/bin_glmm02_breed_type_stability.png")
+m.stab.plot(round(m.stab.breed$summary[, -1], 3))
 dev.off()
 ```
+### GLMM 03: Effect of training*condition
+
+```{r eval=FALSE, echo=FALSE}
+xx.fe.re=fe.re.tab(fe.model="choice_letter ~ breed_type*condition + age_months + sex + first_baited_box",
+                   re="(1|breed_recoded)", data=model.data)
+xx.fe.re$summary
+```
+
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. Right now (23 December 2024), we don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+full.choice.int.train <- glmer(choice_letter ~ condition*training + z.age + sex + first_baited_box+
+             (1+ sex.c + condition.c*training.c + first_baited_box.c + z.age || breed_recoded),
+             data = model.data, family = binomial,
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+
+#had to exclude correlation parameters between rss and icpt because they were unidentifiable
+```
+
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.int.train)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full=drop1(full.choice.int.train, test="Chisq")
+round(drop1.full,3)
+#the interaction condition*breed_type is not significant, so we remove it but keep both main effects
+```
+#### Interaction not significant, we drop it
+```{r}
+full.choice.train <- glmer(choice_letter ~ condition + training + z.age + sex + first_baited_box+
+             (1+ sex.c + condition.c + training.c + first_baited_box.c + z.age || breed_recoded),
+             data = model.data, family = binomial,
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+
+```
+#### Distribution of BLUPs
+```{r}
+ranef.diagn.plot(full.choice.train)
+```
+#### Variance Inflation Factors
+```{r}
+vif(full.choice.train) #collinearity is no problem
+```
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.train)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full=drop1(full.choice.train, test="Chisq")
+round(drop1.full,3)
+#the interaction condition*breed_type is not significant, so we remove it but keep both main effects
+```
+
+#### confidence intervals
+
+```{r}
+boot.res.train=boot.glmm.pred(model.res=full.choice.train, excl.warnings=T,
+	nboots=1000, para=T)
+res.train<-round(boot.res.train$ci.estimates, 3)
+res.train
+```
+#### model stability
+
+```{r eval=FALSE, include=FALSE}
+
+# One breed at a time excluded to assess the impact of possible outliers 
+m.stab.train <- glmm.model.stab(model.res = full.choice.train, use = c("breed_recoded"))
+
+table(m.stab.train$detailed$lme4.warnings) #several models failed to converge
+
+xx.train <- as.data.frame(round(m.stab.b$summary[, -1], 3))
+#table with model stability
+xx.train
+
+#plot of stability (remember to execute all three lines at the same time)
+png("plots/bin_glmm03_train_stability.png")
+m.stab.plot(round(m.stab.train$summary[, -1], 3))
+dev.off()
+```
+
+
 ## Inter-coder reliability for binary variable
 ```{r}
-#define random videos to be coded (25% of final sample size=60 videos)
-set.seed(43) #for reproducibility
-sample(c(1:240), 60)
+#LL:remove
+# #define random videos to be coded (25% of final sample size = 60 videos)
+# set.seed(43) #for reproducibility
+# dog_ids<-sample(c(1:240), 60) #dog ids to code
+# dog_ids
+# reliab.data<-data.frame()
+# reliab.data<-data.frame(dog_ID=dog_ids)
+# 
+# #create excel file for scoring reliability 
+# reliab.data <- merge(reliab.data, xdata[, c("dog_ID", "dog_cdl_name")], by = "dog_ID", all.x = TRUE)
+# # Restore the original order of dog_id
+# reliab.data <- reliab.data[match(dog_ids, reliab.data$dog_ID), ]
+# # Save reliab.data to an Excel file
+# write_xlsx(reliab.data, "data/inter_rater_reliability.xlsx")
+
+#read in reliability scorings
+reliab.data<- read_excel("data/inter_rater_reliability.xlsx")
+
+#Calculate Percentage Agreement
+percentage_agreement <- sum(reliab.data$choice1 == reliab.data$choice2) / nrow(reliab.data) * 100
+cat("Percentage Agreement:", round(percentage_agreement, 2), "%\n")
+#Percentage Agreement: 96.67 %
+
+#calculate Cohen's kappa
+kappa_result <- kappa2(reliab.data[, c("choice1", "choice2")], "unweighted")  #Subjects = 60 Raters = 2 Kappa = 0.933 z = 7.25 p-value = 4.3e-13 
 ```
 
