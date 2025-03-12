@@ -129,7 +129,7 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 128,Henri,grey,no_displacement,no_displacement,knowledge,border_collie,m,no,1,31/12/2023,07/12/2024,11,trickdog,VB,GR,2,2,2,no,6,B,blue,
 129,Ginger9,grey,no_displacement,no_displacement,knowledge,golden_retriever,f,yes,8,17/03/2021,07/12/2024,44,"dummy, therapiebegleithund, obedience",VB,GR,2,2,2,no,6,A,grey,
 130,Poppy4,blue,displacement,displacement,false_belief,welsh_corgi_pembroke,f,no,1,10/10/2020,13/12/2024,50,"trickdog, obedience",VB,GR,2,3,2,no,7,B,grey,short buckets
-131,Cwinta,blue,no_displacement,no_displacement,false_belief,nederlanse_kooikjerhonde,f,no,1,27/04/2016,14/12/2024,103,"therapiebegleithund, agility, hoopers, obedience, rallyobedience, tricktraining",VB,GR,3,2,2,no,7,B,grey,
+131,Mia7,blue,no_displacement,no_displacement,false_belief,golden_retriever,f,no,8,30/04/2017,13/12/2024,91,therapy_dog,VB,GR,2,2,2,no,6,B,grey,
 132,Veri,blue,displacement,displacement,control,whippet,f,no,10,01/04/2022,11/12/2024,32,no,GR,VB,2,3,2,no,7,A,blue,
 133,Lola9,blue,no_displacement,no_displacement,knowledge,golden_retriever,f,yes,8,23/09/2014,07/12/2024,122,"bhvt, dummytraining, therapiebegleithund",VB,GR,4,2,2,no,8,A,blue,
 134,Mogli2,blue,no_displacement,displacement,control,border_collie,m,no,1,24/12/2011,16/12/2024,155,no,CH,VB,4,2,2,no,8,B,grey,
@@ -243,5 +243,5 @@ dog_ID,dog_cdl_name,first_bucket_A,fam_phase_2_first_trial_type,fam_phase_3_firs
 ,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. Ctr,60.64835165,,,,,,,,,,
-,,,,,,,,,,,,Avg. age. FB,60.2,,,,,,,,,,
+,,,,,,,,,,,,Avg. age. FB,60.06666667,,,,,,,,,,
 ,,,,,,,,,,,,Avg. age. KNOW,59.50537634,,,,,,,,,,
