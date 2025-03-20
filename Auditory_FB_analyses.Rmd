@@ -62,6 +62,17 @@ mean(fb_subset$choice_letter=="A")
 mean(know_subset$choice_letter=="A")
 mean(ctr_subset$choice_letter=="A")
 
+#demographic info counterbalanced
+range(fb_subset$age_months)
+range(know_subset$age_months)
+range(ctr_subset$age_months)
+sd(fb_subset$age_months)
+sd(know_subset$age_months)
+sd(ctr_subset$age_months)
+table(fb_subset$sex)
+table(know_subset$sex)
+table(ctr_subset$sex)
+
 #experimenters (communicator and hider)
 table(xdata$condition, xdata$communicator)
 table(xdata$condition, xdata$hider)
@@ -74,7 +85,7 @@ table(xdata$choice_letter, xdata$experimenter_dyad)
 range(xdata$age)
 mean(xdata$age)
 mean(fb_subset$age_months)
-mean(know_subset$age_months, na.rm=T) 
+mean(know_subset$age_months) 
 mean(ctr_subset$age_months)
 #how many <2 years in each condition
 sum(fb_subset$age_months<24) #9
