@@ -202,7 +202,11 @@ mosaic.plot.data  <- xdata %>%
   )) #specify order of factor levels for factor_relevel
 
 #saving the plot
-png("./plots/Fig_3_mosaic_choices_240_dogs.png")
+png("./plots/Fig_3_mosaic_choices_240_dogs_1200dpi.png", width = 16, height = 13, units = "in", res=1200)
+par(mar=c(6, 7.8, 2, 7), mgp=c(5, 2, 0), tcl=-0.15, las=1,
+    cex.axis = 2.5,   # Increase axis tick labels
+    cex.lab = 3.7,    # Increase axis labels
+    cex.main = 3)     # Increase plot titles
 plot(mosaic.plot.data$condition,mosaic.plot.data$choice_letter,
   xlab = "Condition",
   ylab = "Bucket chosen")
