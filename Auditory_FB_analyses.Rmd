@@ -21,7 +21,7 @@ source("functions/glmm_stability.r")
 source("functions/boot_glmm.r")
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #load workspace
-#load("~/GitHub/Auditory_false_belief_dogs/workspace/Auditory_FB_workspace.RData")
+load("~/GitHub/Auditory_false_belief_dogs/workspace/Auditory_FB_workspace.RData")
 
 ```
 
@@ -124,6 +124,10 @@ unique(levels(xdata$breed_recoded))
 #food
 sum(grepl(c("sausages"), xdata$notes))
 sum(grepl(c("own food"), xdata$notes))
+
+#choice of bucket A during fam. phase 3
+summary(as.factor(xdata$fam_3_choice_first_relocation_trial))
+
 ```
 
 
