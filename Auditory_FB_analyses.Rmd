@@ -294,8 +294,6 @@ plot(mosaic.independent.plot.data$condition,mosaic.independent.plot.data$choice_
   ylab = "Bucket chosen",
   main = "Independent breeds" )
 dev.off()
-
-
 ```
 
 #FCI plots
@@ -846,6 +844,219 @@ m.stab.plot(round(m.stab.train$summary[, -1], 3))
 dev.off()
 ```
 
+### Preparing data for modelling
+
+```{r}
+#load the data file containing the 2021 study observations
+orig_data <- read.csv("data/Dataset_S2_from_2021_study.csv", header = TRUE) %>% 
+   mutate(choice_letter = as.factor(choice_letter),
+         condition = as.factor(condition),
+         breed= as.factor(breed),
+         first_B_box=as.factor(first_B_box),
+         study=as.factor(study),
+         age = as.numeric(age)) %>% #age was coded in years for that study
+  filter(choice_letter %in% c("A", "B")) %>%   # Keep rows where choice_letter is "A" or "B" in case of NAs
+  droplevels()
+
+which(is.na(xdata$choice_letter)) #double check for NAs
+
+# recode age in present study
+model.data$age<-model.data$age_months %/% 12
+# add column study to present study
+model.data$study<-as.factor(rep("2025", length(model.data$dog_ID)))
+
+#check breeds in both studies
+levels(orig_data$breed)
+#recode some breed labels for similarity
+orig_data <- orig_data %>%
+  mutate(
+    breed_recoded = factor(
+      dplyr::recode(
+        as.character(breed),
+        "vizsla" = "hungarian_shorthaired_pointer",
+        "giant_schnauzer" = "schnauzer"))) %>% 
+  rename(FCI_group = fci_group,
+         dog_ID = dog,
+         first_baited_box=first_B_box)
+
+levels(model.data$breed_recoded)
+levels(orig_data$breed_recoded)
+
+# shared levels
+intersect(levels(orig_data$breed_recoded), levels(model.data$breed_recoded))
+# levels only in 2021 study
+setdiff(levels(orig_data$breed_recoded), levels(model.data$breed_recoded))
+# levels only in 2025 study
+setdiff(levels(model.data$breed_recoded), levels(orig_data$breed_recoded)) #many breeds are only in the new study. It might not be possible to use breed as random icpt, it might have to be FCI breed group
+
+levels(as.factor(orig_data$FCI_group))
+levels(as.factor(model.data$FCI_group))
+```
+
+
+```{r}
+model.data2<-rbind(orig_data [, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter")],
+                   model.data[, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter")])
+
+levels(model.data2$first_baited_box)
+
+model.data2 <- model.data2 %>%
+  mutate(
+    condition = factor(dplyr::recode(condition,
+                                    control = "knowledge_control",
+                                    knowledge = "true_belief")),
+    first_baited_box = factor(ifelse(
+      first_baited_box == "blue",
+      "blue",
+      "other_colour"
+    )))
+
+str(model.data2)
+
+levels(model.data2$condition)
+table(model.data2$condition, model.data2$choice_letter)
+```
+
+```{r}
+model.data2<-model.data2 %>% 
+  #making sure factors are treated as such
+  mutate(dog_ID=as.factor(dog_ID)) %>% 
+  mutate(sex=as.factor(sex)) %>% 
+  mutate(FCI_group=as.factor(FCI_group)) %>% 
+  mutate(choice_letter=as.factor(choice_letter)) %>% 
+  #centering variables
+  mutate(z.age = as.numeric(scale(age, scale = T, center = T)), #age scaled and centered (=z-transformed, we subtracted the mean and divided by SD)
+         sex.c = as.numeric(scale(as.numeric(as.factor(sex)), scale=F, center=T)), #factors manually dummy coded and centered (i.e., we subtracted the mean value from each observed value)
+         condition.kc = as.numeric(scale(as.numeric(as.factor(condition[2])), scale=F, center=T)),
+         condition.tb = as.numeric(scale(as.numeric(as.factor(condition[3])), scale=F, center=T)),
+         first_baited_box.c = as.numeric(scale(as.numeric(as.factor(first_baited_box)), scale=F, center=T)),
+         study.c=as.numeric(scale(as.numeric(as.factor(study)), scale=F, center=T)))
+
+
+
+view(dfSummary(model.data2))
+
+summary(model.data2$age)
+summary(model.data2$z.age)
+
+#check how many levels of breed 
+unique(levels(model.data2$breed_recoded)) #75 different breeds
+
+#checking if the data preparations worked as expected
+str(model.data2)
+```
+## GLMM 04: comparison with 2021 study
+
+```{r eval=FALSE, echo=FALSE}
+xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition*study + age + sex + first_baited_box",
+                   re="(1|breed_recoded)", data=model.data2)
+xx.fe.re$summary
+```
+
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. We don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+full.choice.st.int <- glmer(choice_letter ~ condition*study + z.age + sex + first_baited_box+
+             (1 + (condition.kc + condition.tb)*study.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             data = model.data2, family = binomial, 
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+```
+
+#### Variance Inflation Factors
+```{r}
+vif(full.choice.st.int) #collinearity is no problem
+```
+
+#### Distribution of BLUPs
+```{r}
+ranef.diagn.plot(full.choice.st.int)
+```
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.st.int)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full.st.int=drop1(full.choice.st.int, test="Chisq")
+round(drop1.full.st.int,3)
+```
+```{r}
+#interaction not significant, so we remove it
+
+xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition + study + age + sex + first_baited_box",
+                   re="(1|breed_recoded)", data=model.data2)
+xx.fe.re$summary
+```
+
+``` {r mixed modeling, error=TRUE}
+#full model with all rs within breed. We don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
+
+full.choice.st <- glmer(choice_letter ~ condition + study + z.age + sex + first_baited_box +
+             (1 + condition.kc + condition.tb + study.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             data = model.data2, family = binomial, 
+             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
+)
+```
+
+
+#### Distribution of BLUPs
+```{r}
+ranef.diagn.plot(full.choice.st)
+```
+
+#### model output
+  + Coefficients
+```{r}
+round(summary(full.choice.st)$coefficients, 3)
+```
+  + Individual predictors: likelihood ratio tests  
+Drop1: P values for the individual effects were based on likelihood ratio tests comparing the full with respective reduced models (Barr et al., 2013; R function drop1 with argument 'test' set to "Chisq"). 
+
+```{r}
+drop1.full.st=drop1(full.choice.st, test="Chisq")
+round(drop1.full.st,3)
+
+# pairwise comparisons
+library(emmeans)
+emm <- emmeans(full.choice.st, "condition")
+pairs(emm, adjust = "tukey", type = "response") # on response scale
+```
+
+
+```{r}
+summary(full.choice.st.int)$varcor
+```
+#### confidence intervals
+
+```{r}
+boot.res.st=boot.glmm.pred(model.res=full.choice.st, excl.warnings=T,
+	nboots=1000, para=T)
+res.st<-round(boot.res.st$ci.estimates, 3)
+res.st
+```
+#### model stability
+
+```{r eval=FALSE, include=FALSE}
+
+# One breed at a time excluded to assess the impact of possible outliers 
+m.stab.st <- glmm.model.stab(model.res = full.choice.st, use = c("breed_recoded"))
+
+table(m.stab.st$detailed$lme4.warnings) #some models failed to converge
+
+xx <- as.data.frame(round(m.stab.st$summary[, -1], 3))
+#table with model stability
+xx
+
+#plot of stability (execute all three lines at the same time)
+png("plots/bin_glmm04_choice_stability.png")
+m.stab.plot(round(m.stab.st$summary[, -1], 3))
+dev.off()
+```
 
 ## Inter-coder reliability for binary variable
 ```{r}
