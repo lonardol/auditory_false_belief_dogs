@@ -1,0 +1,105 @@
+---
+title: "Unpregistered Bayesian analysis"
+author: "Luke Maurits"
+date: "2025-07-02"
+output:
+  word_document: default
+  html_document: default
+R_version: 4.4.3
+---
+## Load libraries and pre-prepared data as used for ML models
+  
+```{r}
+library(tidyverse)
+library(brms)
+library(marginaleffects)
+
+d <- read_csv("data/prepared_data.csv")%>%
+  mutate(choice_num = as.numeric(ifelse(choice_letter == "A", 1,
+                                        ifelse(choice_letter == "B", 0,NA))))
+```
+
+## Fit two models
+
+The full model has per-condition parameters while the null model has only an
+intercept.  Age, sex and `first_baited_box` are present in both models.
+
+Regularising priors of N(0, 1.5) (which place approximately 95% of prior
+probability within the bounds corresponding to response probabilities between
+0.05 and 0.95) are used for the null model intercept and the full model
+condition parameters.  Tighter priors of N(0, 0.75) are used for the two-level
+predictors (sex and `first_baited_box`), and N(0, 0.75/4) is used for age, which
+has been z-transformed and has a "span" of approximately 4.
+
+More chains and iterations are used than normal to assure reliable estimation
+of Bayes factors from posterior samples.
+
+```{r}
+m_null <- brm(choice_num ~ 1 + z.age + sex + first_baited_box,
+                     data = d, family = "bernoulli",
+                     prior=prior(normal(0, 1.5), class="Intercept") +
+                           prior(normal(0, 0.75/4), class="b", coef="z.age") +
+                           prior(normal(0, 0.75), class="b"),
+                     save_pars = save_pars(all = TRUE), iter=5000, chains=8, cores=8)
+                     
+m_full <- brm(choice_num ~ 0 + condition + z.age + sex + first_baited_box,
+                     data = d, family = "bernoulli",
+                     prior=prior(normal(0, 1.5), class="b", coef="conditioncontrol") +
+                           prior(normal(0, 1.5), class="b", coef="conditionfalse_belief") +
+                           prior(normal(0, 1.5), class="b", coef="conditionknowledge") +
+                           prior(normal(0, 0.75/4), class="b", coef="z.age") +
+                           prior(normal(0, 0.75), class="b"),
+                     save_pars = save_pars(all = TRUE), iter=5000, chains=8, cores=8)
+```
+
+## Model comparison
+
+```{r}
+my_bf <- bayes_factor(m_null, m_full, log=TRUE)
+```
+
+A Bayes Factor model comparison favours the null model with a log BF of
+`r my_bf$bf`.  This is extremely weak evidence in favour of the null, so
+essentially both the null and full model can equally well account for the data.
+
+## Inspecting full model
+
+We compute success probabilites in each condition and contrasts between them
+at mean age (z.age = 0), marginalising over the effects of sex and first baited
+box, weighing the four combinations of those variables equally:
+
+```{r}
+avg_predictions(m_full, by="condition", newdata=datagrid(grid_type="balanced", z.age=0))
+avg_comparisons(m_full, variables="condition", newdata=datagrid(grid_type="balanced", z.age=0))
+```
+
+The knowledge vs control contrast has a posterior mean estimate very close to
+zero and a 95% CI which is roughly centered on zero: there's essentially no
+evidence of a difference between these two effects.  In contrast the 95% CI
+for the contrast between the false belief and TB / KSC conditions is almost
+wholly positive .
+
+We can calculate the posterior probability that the FB success rate is higher
+than both others:
+
+```{r}
+x <- as_draws_df(m_full)
+pp <- mean((x$b_conditionfalse_belief > x$b_conditioncontrol) & (x$b_conditionfalse_belief > x$b_conditionknowledge))
+```
+
+The value of `r pp` constitutes strong evidence.
+
+## Summary
+
+The full model's estimated success rates are a very close match to the
+anticipated pattern, i.e. strong evidence that success is highest in the FB
+task and no evidence of a difference in success rate between the other two
+conditions.  However, the evidence favouring this model over the null model is
+extremely weak: we have a lack of evidence for a condition effect, rather than
+evidence for a lack of a condition effect.
+
+It might seem a little paradoxical that both these things could be true at once,
+but the effects in question seem to be very small and all the estimated success
+rates are quite close to chance, which is when binomially distributed variables
+are at their most variable.  
+The high posterior probability for the FB condition havingthe highest rate of success is easier to intuitively reconcile with the weak evidence for condition mattering at all if we think of it as strong evidence against the specific instance of condition mattering where FB has the *lowest* success rate.  This leaves "un-ruled out" both condition mattering the other way around *and* condition not mattering at all.
