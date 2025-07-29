@@ -852,13 +852,14 @@ orig_data <- read.csv("data/Dataset_S2_from_2021_study.csv", header = TRUE) %>%
    mutate(choice_letter = as.factor(choice_letter),
          condition = as.factor(condition),
          breed= as.factor(breed),
+         dog_cdl_name=as.factor(dog_cdl_name),
          first_B_box=as.factor(first_B_box),
          study=as.factor(study),
          age = as.numeric(age)) %>% #age was coded in years for that study
   filter(choice_letter %in% c("A", "B")) %>%   # Keep rows where choice_letter is "A" or "B" in case of NAs
   droplevels()
 
-which(is.na(xdata$choice_letter)) #double check for NAs
+which(is.na(orig_data$choice_letter)) #double check for NAs
 
 # recode age in present study
 model.data$age<-model.data$age_months %/% 12
@@ -887,7 +888,7 @@ intersect(levels(orig_data$breed_recoded), levels(model.data$breed_recoded))
 # levels only in 2021 study
 setdiff(levels(orig_data$breed_recoded), levels(model.data$breed_recoded))
 # levels only in 2025 study
-setdiff(levels(model.data$breed_recoded), levels(orig_data$breed_recoded)) #many breeds are only in the new study. It might not be possible to use breed as random icpt, it might have to be FCI breed group
+setdiff(levels(model.data$breed_recoded), levels(orig_data$breed_recoded)) #many breeds are only in the new study.
 
 levels(as.factor(orig_data$FCI_group))
 levels(as.factor(model.data$FCI_group))
@@ -895,8 +896,8 @@ levels(as.factor(model.data$FCI_group))
 
 
 ```{r}
-model.data2<-rbind(orig_data [, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter")],
-                   model.data[, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter")])
+model.data2<-rbind(orig_data [, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter", "dog_cdl_name")],
+                   model.data[, c("dog_ID", "condition", "study", "breed_recoded", "FCI_group", "first_baited_box", "sex", "age", "choice_letter", "dog_cdl_name")])
 
 levels(model.data2$first_baited_box)
 
@@ -949,7 +950,7 @@ str(model.data2)
 
 ```{r eval=FALSE, echo=FALSE}
 xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition*study + age + sex + first_baited_box",
-                   re="(1|breed_recoded)", data=model.data2)
+                   re="(1|breed_recoded) + (1|dog_cdl_name)", data=model.data2)
 xx.fe.re$summary
 ```
 
@@ -957,7 +958,8 @@ xx.fe.re$summary
 #full model with all rs within breed. We don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
 
 full.choice.st.int <- glmer(choice_letter ~ condition*study + z.age + sex + first_baited_box+
-             (1 + (condition.kc + condition.tb)*study.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             (1 + (condition.kc + condition.tb)*study.c +  z.age + sex.c + first_baited_box.c || breed_recoded) +
+               (1|dog_cdl_name), 
              data = model.data2, family = binomial, 
              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
 )
@@ -989,7 +991,7 @@ round(drop1.full.st.int,3)
 #interaction not significant, so we remove it
 
 xx.fe.re=fe.re.tab(fe.model="choice_letter ~ condition + study + age + sex + first_baited_box",
-                   re="(1|breed_recoded)", data=model.data2)
+                   re="(1|breed_recoded) + (1|dog_cdl_name)", data=model.data2)
 xx.fe.re$summary
 ```
 
@@ -997,7 +999,8 @@ xx.fe.re$summary
 #full model with all rs within breed. We don't have enough variation within breeds for all these parameters, so we remove the parameters for the correlations between random slopes and intercept. 
 
 full.choice.st <- glmer(choice_letter ~ condition + study + z.age + sex + first_baited_box +
-             (1 + condition.kc + condition.tb + study.c +  z.age + sex.c + first_baited_box.c || breed_recoded), 
+             (1 + condition.kc + condition.tb + study.c +  z.age + sex.c + first_baited_box.c || breed_recoded) +
+               (1 | dog_cdl_name), 
              data = model.data2, family = binomial, 
              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))
 )
